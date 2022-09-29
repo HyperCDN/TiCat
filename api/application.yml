@@ -1,0 +1,13 @@
+# user specifiable configurations go here
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri:  http://localhost:8080/realms/ticat
+          jwk-set-uri: http://localhost:8080/realms/ticat/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticat
+    username: ticat
+    password: ticatsupersecret

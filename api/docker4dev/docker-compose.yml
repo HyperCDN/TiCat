@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  postgresql:
+    image: postgres:14.5-alpine
+    container_name: postgresql
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgressupersecret
+
+  keycloak:
+    container_name: keycloak
+    image: bitnami/keycloak:19.0.2
+    restart: unless-stopped
+    depends_on:
+      - postgresql
+    environment:
+      - KEYCLOAK_CREATE_ADMIN_USER=true
+      - KEYCLOAK_ADMIN_USER=admin
+      - KEYCLOAK_ADMIN_PASSWORD=adminsupersecret
+      - KEYCLOAK_DATABASE_HOST=postgresql
+      - KEYCLOAK_DATABASE_PORT=5432
+      - KEYCLOAK_DATABASE_NAME=keycloak
+      - KEYCLOAK_DATABASE_USER=keycloak
+      - KEYCLOAK_DATABASE_PASSWORD=keycloaksupersecret
+      - KEYCLOAK_HTTP_PORT=8080
+      - PROXY_ADDRESS_FORWARDING=true
+    ports:
+      - 8080:8080

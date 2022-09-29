@@ -1,0 +1,24 @@
+# internal configurations go here
+
+spring:
+  application:
+    name: "TiCat-API"
+  config:
+    additional-location: "file:./,file:./config/"
+  mvc:
+    throw-exception-if-no-handler-found: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      pool-name: TiCatCP
+      max-lifetime: 2000000
+      connection-timeout: 30000
+
+server:
+  port: 9090
+  error:
+    whitelabel:
+      enabled: false
