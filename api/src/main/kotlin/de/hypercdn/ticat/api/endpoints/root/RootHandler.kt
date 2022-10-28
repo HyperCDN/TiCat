@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RestController
 class RootHandler {
 
     @GetMapping(path = ["/"])
-    fun hello(): String{
-        return "Hello!"
-    }
+    fun hello() {}
 
 }

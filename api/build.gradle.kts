@@ -3,9 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.0.0-SNAPSHOT"
     id("io.spring.dependency-management") version "1.0.14.RELEASE"
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.spring") version "1.7.10"
-    kotlin("plugin.jpa") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
+    kotlin("plugin.spring") version "1.7.20"
+    kotlin("plugin.jpa") version "1.7.20"
+    kotlin("plugin.noarg") version "1.7.20"
 }
 
 group = "de.hypercdn.ticat"
@@ -22,6 +23,11 @@ configurations.forEach {
     it.exclude("org.springframework.boot", "spring-boot-starter-tomcat")
 }
 
+noArg {
+    annotation("lombok.NoArgsConstructor")
+    invokeInitializers = true
+}
+
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.spring.io/milestone") }
@@ -30,6 +36,7 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.data:spring-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("org.postgresql:postgresql")
@@ -46,7 +53,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("org.springframework.boot:spring-boot-starter-aop:2.7.3")
+    implementation("org.springframework.boot:spring-boot-starter-aop:2.7.4")
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4")
     implementation("com.fasterxml.jackson.core:jackson-core:2.13.4")

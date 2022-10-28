@@ -1,0 +1,47 @@
+@import "./static/scss/TiCat.scss";
+
+html, body {
+
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+
+  ::-webkit-scrollbar {
+    width: 0.3rem;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $drawer-color;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  a {
+
+    color: $text-color;
+    text-decoration: none;
+
+    :link, :visited, :hover, :active {
+
+      color: $text-color;
+      text-decoration: none;
+
+    }
+
+  }
+
+  #root {
+
+    height: 100%;
+    width: 100%;
+
+  }
+
+}

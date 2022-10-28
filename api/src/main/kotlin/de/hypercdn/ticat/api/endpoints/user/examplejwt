@@ -1,0 +1,46 @@
+eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6ZkFSRUpoRVNRWDljSnlzdWJMUXIyUkdhWXlXNGpVdUZFdkdQSnB2ajRjIn0.eyJleHAiOjE2NjU5NTY1MjEsImlhdCI6MTY2NTk1NjIyMSwiYXV0aF90aW1lIjoxNjY1OTU2MjIxLCJqdGkiOiJmNWRiOGQ1MC0wMzlmLTQ2ZDQtYjY2Ny1lMWE4MjVjZjlhOWIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvcmVhbG1zL1RpQ2F0IiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjI2ZThjMmViLTU2MDItNDg5ZS05M2Q4LWMyN2JkZGJjMDQyZSIsInR5cCI6IkJlYXJlciIsImF6cCI6IlRpQ2F0QXBwIiwic2Vzc2lvbl9zdGF0ZSI6IjY3MWNjZmVkLTUzODctNDAyYy1iZTM4LWJmMWFjOGNjZDliOCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDozMDAwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLXRpY2F0Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJzaWQiOiI2NzFjY2ZlZC01Mzg3LTQwMmMtYmUzOC1iZjFhYzhjY2Q5YjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicHJlZmVycmVkX3VzZXJuYW1lIjoidGljYXRfYWRtaW4iLCJnaXZlbl9uYW1lIjoiIiwiZmFtaWx5X25hbWUiOiIiLCJlbWFpbCI6ImFkbWluQHRpY2F0LmRlbW8ifQ.f0SiU3n4ErQ6xw_yjrjyLj1XXzsY6e5r_sBH9w9-hpVYp0ptVJrFqZw8MGQEXd1qnAI9mN2nZn8B39-m094SpvlvlEXEM5LxAV_85RAcJK08KtfVgt1xZ1w-IAyQZ5xA9ZK6E5DAI07W8lniSccBKYNEvGzxfRehaVEVMTYWUbbD6xah9Hd7wQr9RmAUwMzMOOQTF3az2gpVM2ri7YohKGMDYC4ukkomF_us77J_kssQd-ivMlkEbVtlYpRm74ubqBIJROcPwKVzo5B7D-lPPLuWWNuSBc2EU2HF0GG0sZCcm4txm-wZanpeTYQSVB5qokQeDYgWYTRuIt4z8MFcIg
+
+{
+  "alg": "RS256",
+  "typ": "JWT",
+  "kid": "zfAREJhESQX9cJysubLQr2RGaYyW4jUuFEvGPJpvj4c"
+}
+{
+  "exp": 1665956521,
+  "iat": 1665956221,
+  "auth_time": 1665956221,
+  "jti": "f5db8d50-039f-46d4-b667-e1a825cf9a9b",
+  "iss": "http://localhost:8080/realms/TiCat",
+  "aud": "account",
+  "sub": "26e8c2eb-5602-489e-93d8-c27bddbc042e",
+  "typ": "Bearer",
+  "azp": "TiCatApp",
+  "session_state": "671ccfed-5387-402c-be38-bf1ac8ccd9b8",
+  "acr": "1",
+  "allowed-origins": [
+    "http://localhost:3000"
+  ],
+  "realm_access": {
+    "roles": [
+      "default-roles-ticat",
+      "offline_access",
+      "uma_authorization"
+    ]
+  },
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "manage-account-links",
+        "view-profile"
+      ]
+    }
+  },
+  "scope": "openid email profile",
+  "sid": "671ccfed-5387-402c-be38-bf1ac8ccd9b8",
+  "email_verified": true,
+  "preferred_username": "ticat_admin",
+  "given_name": "",
+  "family_name": "",
+  "email": "admin@ticat.demo"
+}

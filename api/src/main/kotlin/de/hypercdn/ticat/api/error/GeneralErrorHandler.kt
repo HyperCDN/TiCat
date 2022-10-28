@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.NoHandlerFoundException
 import java.lang.Error
 
@@ -15,6 +16,10 @@ class GeneralErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNotFound(exception: NoHandlerFoundException) {
+    }
+
+    @ExceptionHandler
+    fun handleResponseStatusException(exception: ResponseStatusException){
     }
 
     @ExceptionHandler

@@ -1,0 +1,24 @@
+@import "../../static/scss/TiCat.scss";
+
+.hero {
+
+  color: $inverse-text-color;
+  height: 100%;
+
+  .hero-grid {
+
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+    .hero-title {
+
+    }
+
+    .hero-description {
+
+    }
+
+  }
+
+}

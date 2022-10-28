@@ -16,9 +16,13 @@ spring:
       pool-name: TiCatCP
       max-lifetime: 2000000
       connection-timeout: 30000
+  flyway:
+    enabled: true
 
 server:
   port: 9090
   error:
     whitelabel:
       enabled: false
+  servlet:
+    context-path: "/api"

@@ -1,0 +1,33 @@
+@import "../../static/scss/TiCat.scss";
+
+#app-header {
+
+  height: $app-bar-height;
+
+  #app-header-bar {
+
+    position: fixed;
+    background-color: $header-color;
+    z-index: $app-bar-z-index;
+    height: $app-bar-height;
+
+    #app-header-title {
+
+      color: $inverse-text-color;
+      font-size: 1.5em;
+
+    }
+
+    #app-header-drawer-button {
+
+      #app-header-drawer-button-icon {
+
+        color: $inverse-text-color;
+
+      }
+
+    }
+
+  }
+
+}
