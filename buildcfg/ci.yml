@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+
+jobs:
+  build_and_test_backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: JDK Setup
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Check
+        working-directory: api
+        run: ./gradlew check
+
+      - name: Test
+        working-directory: api
+        run: ./gradlew test
+
+      - name: Build
+        working-directory: api
+        run: ./gradlew build
+
+      - name: Package
+        working-directory: api
+        run: ./gradlew bootJar
+
+  build_and_test_frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Test
+        working-directory: web
+        run: npm test
+
+      - name: Build
+        working-directory: web
+        run: npm build
+
+  build_docker:
+    name: Docker
+    needs: [build_and_test_backend, build_and_test_frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: user/app:latest
