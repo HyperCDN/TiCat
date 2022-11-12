@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.endpoints.board
 
+import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,20 +15,20 @@ class BoardsHandler @Autowired constructor(
 
     // auth required
     @GetMapping("/boards/owned")
-    fun listOwnedBoards(): List<Any> {
-        return emptyList()
+    fun listOwnedBoards(): List<BoardJson> {
+        throw NotImplementedError()
     }
 
     // auth required
     @GetMapping("/boards/memberof")
-    fun listBoardsWhereMember(): List<Any> {
-        return emptyList()
+    fun listBoardsWhereMember(): List<BoardJson> {
+        throw NotImplementedError()
     }
 
     // optional auth
     @GetMapping("/boards/popular")
-    fun listPopularPublic(): List<Any> {
-        return emptyList()
+    fun listPopularPublic(): List<BoardJson> {
+        throw NotImplementedError()
     }
 
 }

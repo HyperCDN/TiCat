@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.endpoints.board
 
+import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,8 +16,8 @@ class BoardSearchHandler @Autowired constructor(
 
     // optional auth
     @GetMapping("/search/boards")
-    fun searchForBoards(@RequestParam("qName") qName: String): List<Any> {
-        return emptyList()
+    fun searchForBoards(@RequestParam("qName") qName: String): List<BoardJson> {
+        throw NotImplementedError()
     }
 
 }

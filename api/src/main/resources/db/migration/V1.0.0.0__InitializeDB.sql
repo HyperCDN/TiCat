@@ -39,7 +39,7 @@ CREATE TABLE boards
 );
 
 -- Board membership can be requested, offered, granted or blocked from requesting again
-CREATE TYPE MEMBERSHIP_STATUS AS ENUM ('REQUESTED', 'OFFERED', 'GRANTED', 'BLOCKED');
+CREATE TYPE BOARD_MEMBERSHIP_STATUS AS ENUM ('REQUESTED', 'OFFERED', 'GRANTED', 'BLOCKED');
 
 -- Represents users within a board; Contains board specific permissions
 CREATE TABLE board_members
@@ -47,7 +47,7 @@ CREATE TABLE board_members
     user_uuid        UUID              NOT NULL,
     board_id         VARCHAR(16)       NOT NULL,
     created_at       TIMESTAMP                  DEFAULT NOW(),
-    status           MEMBERSHIP_STATUS NOT NULL DEFAULT 'BLOCKED',
+    status           BOARD_MEMBERSHIP_STATUS NOT NULL DEFAULT 'BLOCKED',
     -- permissions and overrides
     can_view         BOOLEAN                    DEFAULT true,
     can_use          BOOLEAN                    DEFAULT true,

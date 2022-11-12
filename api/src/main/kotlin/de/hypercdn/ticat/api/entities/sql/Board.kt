@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.entities.sql
 
 import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
-import de.hypercdn.ticat.api.entities.sql.enums.Visibility
+import de.hypercdn.ticat.api.entities.sql.enums.BoardVisibility
 import jakarta.persistence.*
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.DynamicInsert
@@ -66,7 +66,7 @@ class Board() {
     )
     @ColumnDefault("MEMBERS_ONLY")
     @Enumerated(EnumType.STRING)
-    var visibility: Visibility = Visibility.MEMBERS_ONLY
+    var visibility: BoardVisibility = BoardVisibility.MEMBERS_ONLY
 
     @Column(
         name = "access_mode",
@@ -74,7 +74,7 @@ class Board() {
     )
     @ColumnDefault("MANUAL_ADD")
     @Enumerated(EnumType.STRING)
-    var boardAccessMode: BoardAccessMode = BoardAccessMode.MANUAL_ADD
+    var accessMode: BoardAccessMode = BoardAccessMode.MANUAL_ADD
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")

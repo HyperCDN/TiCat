@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.endpoints.board
 
+import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,20 +20,20 @@ class BoardHandler @Autowired constructor(
 
     // optional auth
     @GetMapping("/board/:boardId")
-    fun getBoard(@PathVariable("boardId") boardId: String): Any {
-        return Any()
+    fun getBoard(@PathVariable("boardId") boardId: String): BoardJson {
+        throw NotImplementedError()
     }
 
     // auth required
     @PostMapping("/board")
-    fun createBoard(@RequestBody board: Any): Any {
-        return Any()
+    fun createBoard(@RequestBody board: Any): BoardJson {
+        throw NotImplementedError()
     }
 
     // auth required
     @PutMapping("/board")
-    fun updateBoard(@RequestBody board: Any): Any {
-        return Any()
+    fun updateBoard(@RequestBody board: Any): BoardJson {
+        throw NotImplementedError()
     }
 
     // auth required
