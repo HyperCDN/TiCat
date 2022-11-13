@@ -45,6 +45,10 @@ class UserJson(
 
     class Permissions {
 
+        @JsonProperty(value = "isSystem", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var isSystem: Boolean? = null
+
         @JsonProperty(value = "isAdmin", required = false)
         @JsonInclude(JsonInclude.Include.NON_NULL)
         var isAdmin: Boolean? = null
@@ -96,6 +100,7 @@ class UserJson(
     fun includePermissions(skip: Boolean = false): UserJson {
         if (skip) return this
         val tmp = Permissions()
+        tmp.isSystem = user?.isSystem
         tmp.isAdmin = user?.isAdmin
         tmp.canLogin = user?.canLogin
         tmp.canBoardCreate = user?.canBoardCreate

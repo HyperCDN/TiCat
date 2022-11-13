@@ -1,9 +1,11 @@
 package de.hypercdn.ticat.api.entities.sql.joinkeys
 
+import lombok.NoArgsConstructor
 import java.io.Serializable
 import java.util.*
 
-class BoardMemberId() : Serializable {
-    lateinit var userUUID: UUID
-    lateinit var boardId: String
-}
+@NoArgsConstructor
+class BoardMemberId(
+    var userUUID: UUID,
+    var boardId: String
+) : Serializable {}

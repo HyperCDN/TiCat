@@ -17,6 +17,7 @@ class SecurityConfig {
         http
             .csrf().disable().cors().disable()
             .authorizeHttpRequests {
+                // no auth or optional
                 it.requestMatchers( HttpMethod.GET,
                     "/config",
                     "/board/*",
@@ -32,9 +33,11 @@ class SecurityConfig {
                 it.requestMatchers( HttpMethod.DELETE,
                     ""
                 ).permitAll()
-
+                // auth required
                 it.requestMatchers( HttpMethod.GET,
                     "/user/test",
+                    "/user/info",
+                    "/search/users",
                     "/boards/owned",
                     "/boards/memberof"
                 ).authenticated()

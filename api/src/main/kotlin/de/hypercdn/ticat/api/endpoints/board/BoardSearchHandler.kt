@@ -16,7 +16,9 @@ class BoardSearchHandler @Autowired constructor(
 
     // optional auth
     @GetMapping("/search/boards")
-    fun searchForBoards(@RequestParam("qName") qName: String): List<BoardJson> {
+    fun searchForBoards(
+        @RequestParam("qName") qName: String
+    ): List<BoardJson> {
         throw NotImplementedError()
     }
 

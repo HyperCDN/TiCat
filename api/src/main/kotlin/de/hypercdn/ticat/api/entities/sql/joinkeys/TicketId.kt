@@ -1,9 +1,10 @@
 package de.hypercdn.ticat.api.entities.sql.joinkeys
 
+import lombok.NoArgsConstructor
 import java.io.Serializable
-import kotlin.properties.Delegates
 
-class TicketId : Serializable {
-    var ticketId by Delegates.notNull<Int>()
-    lateinit var boardId: String
-}
+@NoArgsConstructor
+class TicketId(
+    var id: Int,
+    var boardId: String
+) : Serializable {}

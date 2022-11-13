@@ -5,9 +5,8 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.*
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import java.lang.RuntimeException
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "users")
@@ -60,6 +59,13 @@ class User() {
     var email: String? = null
 
     @Column(
+        name = "is_system",
+        nullable = false
+    )
+    @ColumnDefault("false")
+    var isSystem: Boolean = false
+
+    @Column(
         name = "is_admin",
         nullable = false
     )
@@ -110,6 +116,10 @@ class User() {
         fun currentAuthUUID(): UUID {
             return UUID.fromString(jwtAuthenticationToken().tokenAttributes["sub"] as String)
         }
+
+        val SYSTEM_UUID: UUID = UUID.fromString("00000000-0000-4000-0000-000000000000")
+        val DELETED_USER_UUID: UUID = UUID.fromString("00000000-0000-4000-0000-000000000001")
+        val GUEST_UUID: UUID = UUID.fromString("00000000-0000-4000-0000-000000000002")
 
     }
 }
