@@ -15,14 +15,14 @@ class SecurityConfig {
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain? {
         http
-            .csrf().disable().cors().disable()
+            .csrf().disable()
+            .cors().disable()
+            .anonymous().disable()
             .authorizeHttpRequests {
                 // no auth or optional
                 it.requestMatchers( HttpMethod.GET,
                     "/config",
                     "/board/*",
-                    "/boards/popular",
-                    "/search/boards"
                 ).permitAll()
                 it.requestMatchers( HttpMethod.POST,
                     ""
@@ -36,10 +36,8 @@ class SecurityConfig {
                 // auth required
                 it.requestMatchers( HttpMethod.GET,
                     "/user/test",
-                    "/user/info",
-                    "/search/users",
-                    "/boards/owned",
-                    "/boards/memberof"
+                    "/user/@",
+                    "/user/*"
                 ).authenticated()
                 it.requestMatchers( HttpMethod.POST,
                     "/user/sync",

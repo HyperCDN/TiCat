@@ -102,7 +102,7 @@ class User() {
         fun isAuthenticated(): Boolean {
             val context = SecurityContextHolder.getContext()
             val authentication = context.authentication
-            return authentication != null && authentication.isAuthenticated
+            return authentication != null && authentication.isAuthenticated && authentication is JwtAuthenticationToken
         }
 
         fun jwtAuthenticationToken(): JwtAuthenticationToken {
@@ -111,7 +111,7 @@ class User() {
             if (authentication is JwtAuthenticationToken){
                 return authentication
             }
-            throw IllegalAccessError("No authentication available or type missmatch")
+            throw IllegalAccessError("No authentication available or type mismatch")
         }
         fun currentAuthUUID(): UUID {
             return UUID.fromString(jwtAuthenticationToken().tokenAttributes["sub"] as String)

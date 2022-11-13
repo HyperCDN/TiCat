@@ -1,0 +1,38 @@
+package de.hypercdn.ticat.api.entities.json.`in`.board
+
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
+import de.hypercdn.ticat.api.entities.sql.enums.BoardVisibility
+
+class BoardUpdateJson {
+
+    @JsonProperty(value = "id", required = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var id: String? = null
+
+    @JsonProperty(value = "title", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var title: String? = null
+
+    @JsonProperty(value = "description", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var description: String? = null
+
+    @JsonProperty(value = "settings", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var settings: Settings? = null
+
+    class Settings {
+
+        @JsonProperty(value = "visibility", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var visibility: BoardVisibility? = null
+
+        @JsonProperty(value = "accessMode", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var accessMode: BoardAccessMode? = null
+
+    }
+
+}

@@ -21,7 +21,7 @@ INSERT INTO users (user_uuid, first_name, last_name, display_name, email, is_sys
                    can_board_create, can_board_join)
 VALUES ('00000000-0000-4000-0000-000000000000', null, null, 'System', null, true, false, false, false, false),       -- Representing system user
        ('00000000-0000-4000-0000-000000000001', null, null, 'Deleted User', null, true, false, false, false, false), -- Representing deleted users
-       ('00000000-0000-4000-0000-000000000002', null, null, 'Guest', null, true, false, false, false, false);        -- Representing not logged in / guest users
+       ('00000000-0000-4000-0000-000000000002', null, null, 'Guest', null, true, false, true, false, false);        -- Representing not logged in / guest users
 
 -- Board may be visible to anyone, only logged in users, only members of the board
 CREATE TYPE BOARD_VISIBILITY AS ENUM ('ANYONE', 'LOGGED_IN_USER', 'MEMBERS_ONLY');
