@@ -8,7 +8,7 @@ import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 @IdClass(TicketId::class)
@@ -65,6 +65,7 @@ class Ticket() {
         name = "category",
         nullable = false
     )
+    @Enumerated(EnumType.STRING)
     lateinit var category: TicketCategory
 
     @Column(
@@ -72,6 +73,7 @@ class Ticket() {
         nullable = false
     )
     @ColumnDefault("NORMAL")
+    @Enumerated(EnumType.STRING)
     var priority: TicketPriority = TicketPriority.NORMAL
 
     @Column(
@@ -79,6 +81,7 @@ class Ticket() {
         nullable = false
     )
     @ColumnDefault("OPEN")
+    @Enumerated(EnumType.STRING)
     var status: TicketStatus = TicketStatus.OPEN
 
     @Column(

@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.util.*
 
 @NoArgsConstructor
-class BoardMemberId(
+class MemberId(
     var userUUID: UUID,
     var boardId: String
 ) : Serializable {}

@@ -3,13 +3,9 @@ package de.hypercdn.ticat.api.entities.sql
 import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
 import de.hypercdn.ticat.api.entities.sql.enums.BoardVisibility
 import jakarta.persistence.*
-import org.hibernate.annotations.ColumnDefault
-import org.hibernate.annotations.DynamicInsert
-import org.hibernate.annotations.DynamicUpdate
-import org.hibernate.annotations.Generated
-import org.hibernate.annotations.GenerationTime
+import org.hibernate.annotations.*
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "boards")
@@ -78,6 +74,6 @@ class Board() {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    var members: List<BoardMember> = emptyList()
+    var members: List<Member> = emptyList()
 
 }

@@ -1,17 +1,17 @@
-package de.hypercdn.ticat.api.entities.json.`in`.board
+package de.hypercdn.ticat.api.entities.json.`in`
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
 import de.hypercdn.ticat.api.entities.sql.enums.BoardVisibility
 
-class BoardUpdateJson {
+class BoardCreateJson {
 
     @JsonProperty(value = "id", required = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     var id: String? = null
 
-    @JsonProperty(value = "title", required = false)
+    @JsonProperty(value = "title", required = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     var title: String? = null
 

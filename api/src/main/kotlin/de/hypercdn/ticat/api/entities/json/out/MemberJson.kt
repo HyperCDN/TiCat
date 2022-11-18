@@ -3,13 +3,13 @@ package de.hypercdn.ticat.api.entities.json.out
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.hypercdn.ticat.api.entities.sql.BoardMember
+import de.hypercdn.ticat.api.entities.sql.Member
 import de.hypercdn.ticat.api.entities.sql.enums.BoardMembershipStatus
 import java.util.function.Supplier
 
-class BoardMemberJson(
+class MemberJson(
     @JsonIgnore
-    var boardMember: BoardMember? = null
+    var member: Member? = null
 ) {
 
     @JsonProperty(value = "user", required = false)
@@ -48,11 +48,11 @@ class BoardMemberJson(
 
     }
 
-    fun includeUser(skip: Boolean = false, userSupplier: Supplier<UserJson>? = null): BoardMemberJson {
+    fun includeUser(skip: Boolean = false, userSupplier: Supplier<UserJson>? = null): MemberJson {
         if (skip) return this
         if (userSupplier == null) {
             val tmp = UserJson()
-            tmp.id = boardMember?.userUUID
+            tmp.id = member?.userUUID
             user = tmp
         } else {
             user = userSupplier.get()
@@ -60,11 +60,11 @@ class BoardMemberJson(
         return this
     }
 
-    fun includeBoard(skip: Boolean = false, boardSupplier: Supplier<BoardJson>? = null): BoardMemberJson {
+    fun includeBoard(skip: Boolean = false, boardSupplier: Supplier<BoardJson>? = null): MemberJson {
         if (skip) return this
         if (boardSupplier == null) {
             val tmp = BoardJson()
-            tmp.id = boardMember?.boardId
+            tmp.id = member?.boardId
             board = tmp
         } else {
             board = boardSupplier.get()
@@ -72,19 +72,19 @@ class BoardMemberJson(
         return this
     }
 
-    fun includeStatus(skip: Boolean = false): BoardMemberJson {
+    fun includeStatus(skip: Boolean = false): MemberJson {
         if (skip) return this
-        status = boardMember?.status
+        status = member?.status
         return this
     }
 
-    fun includePermissions(skip: Boolean = false): BoardMemberJson {
+    fun includePermissions(skip: Boolean = false): MemberJson {
         if (skip) return this
         val tmp = Permissions()
-        tmp.canView = boardMember?.canView
-        tmp.canUse = boardMember?.canUse
-        tmp.canManage = boardMember?.canManage
-        tmp.canAdministrate = boardMember?.canAdministrate
+        tmp.canView = member?.canView
+        tmp.canUse = member?.canUse
+        tmp.canManage = member?.canManage
+        tmp.canAdministrate = member?.canAdministrate
         permissions = tmp
         return this
     }

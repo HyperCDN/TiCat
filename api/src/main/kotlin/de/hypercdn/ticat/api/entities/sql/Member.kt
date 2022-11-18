@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.entities.sql
 
 import de.hypercdn.ticat.api.entities.sql.enums.BoardMembershipStatus
-import de.hypercdn.ticat.api.entities.sql.joinkeys.BoardMemberId
+import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
@@ -9,11 +9,11 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@IdClass(BoardMemberId::class)
+@IdClass(MemberId::class)
 @Table(name = "board_members")
 @DynamicInsert
 @DynamicUpdate
-class BoardMember() {
+class Member() {
 
     @Id
     @Column(

@@ -14,7 +14,7 @@ class TicketJson(
     var ticket: Ticket? = null
 ) {
 
-    @JsonProperty(value = "id", required = false)
+    @JsonProperty(value = "id", required = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     var id: Int? = null
 
@@ -25,6 +25,18 @@ class TicketJson(
     @JsonProperty(value = "creator", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     var creator: UserJson? = null
+
+    @JsonProperty(value = "title", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var title: String? = null
+
+    @JsonProperty(value = "content", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var content: String? = null
+
+    @JsonProperty(value = "assignee", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var assignee: UserJson? = null
 
     @JsonProperty(value = "properties", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -45,14 +57,6 @@ class TicketJson(
         var status: TicketStatus? = null
 
     }
-
-    @JsonProperty(value = "content", required = false)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    var content: String? = null
-
-    @JsonProperty(value = "assignee", required = false)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    var assignee: UserJson? = null
 
     fun includeId(skip: Boolean = false): TicketJson {
         if (skip) return this
@@ -84,13 +88,9 @@ class TicketJson(
         return this
     }
 
-    fun includeProperties(skip: Boolean = false): TicketJson {
+    fun includeTitle(skip: Boolean = false): TicketJson {
         if (skip) return this
-        val tmp = Properties()
-        tmp.category = ticket?.category
-        tmp.priority = ticket?.priority
-        tmp.status = ticket?.status
-        properties = tmp
+        title = ticket?.title
         return this
     }
 
@@ -109,6 +109,16 @@ class TicketJson(
         } else {
             assignee = assigneeSupplier.get()
         }
+        return this
+    }
+
+    fun includeProperties(skip: Boolean = false): TicketJson {
+        if (skip) return this
+        val tmp = Properties()
+        tmp.category = ticket?.category
+        tmp.priority = ticket?.priority
+        tmp.status = ticket?.status
+        properties = tmp
         return this
     }
 

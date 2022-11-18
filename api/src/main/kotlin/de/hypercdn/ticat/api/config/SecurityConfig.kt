@@ -20,35 +20,15 @@ class SecurityConfig {
             .anonymous().disable()
             .authorizeHttpRequests {
                 // no auth or optional
-                it.requestMatchers( HttpMethod.GET,
-                    "/config",
-                    "/board/*",
-                ).permitAll()
-                it.requestMatchers( HttpMethod.POST,
-                    ""
-                ).permitAll()
-                it.requestMatchers( HttpMethod.PUT,
-                    ""
-                ).permitAll()
-                it.requestMatchers( HttpMethod.DELETE,
-                    ""
-                ).permitAll()
+                it.requestMatchers( HttpMethod.GET,"/config", "/u/*", "/b", "/b/*", "/t/*", "/t/*/*", "/m/*", "/m/*/*").permitAll()
+                it.requestMatchers( HttpMethod.POST,"" ).permitAll()
+                it.requestMatchers( HttpMethod.PATCH,"" ).permitAll()
+                it.requestMatchers( HttpMethod.DELETE,"" ).permitAll()
                 // auth required
-                it.requestMatchers( HttpMethod.GET,
-                    "/user/test",
-                    "/user/@",
-                    "/user/*"
-                ).authenticated()
-                it.requestMatchers( HttpMethod.POST,
-                    "/user/sync",
-                    "/board"
-                ).authenticated()
-                it.requestMatchers( HttpMethod.PUT,
-                    "/board"
-                ).authenticated()
-                it.requestMatchers( HttpMethod.DELETE,
-                    "/board/*"
-                ).authenticated()
+                it.requestMatchers( HttpMethod.GET,"" ).authenticated()
+                it.requestMatchers( HttpMethod.POST,"/b", "/i/*", "/i/*/*" ).authenticated()
+                it.requestMatchers( HttpMethod.PATCH,"/b/*", "/m/*/*" ).authenticated()
+                it.requestMatchers( HttpMethod.DELETE,"/b/*", "/m/*/*" ).authenticated()
             }
             .oauth2ResourceServer {
                 it.jwt {  }
