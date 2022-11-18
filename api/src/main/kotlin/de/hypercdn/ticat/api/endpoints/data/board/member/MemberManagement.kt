@@ -79,9 +79,10 @@ class MemberManagement @Autowired constructor(
             invitedMember = memberRepository.save(invitedMember)
         }
         return MemberJson(invitedMember)
-            .includeUser() {
+            .includeUser {
                 UserJson(invitedUser)
                     .includeId()
+                    .includeName()
             }
             .includeStatus()
             .includePermissions()
@@ -110,9 +111,10 @@ class MemberManagement @Autowired constructor(
         }
         val updatedMember = memberRepository.save(member)
         return MemberJson(updatedMember)
-            .includeUser() {
+            .includeUser {
                 UserJson(updatedMember.user)
                     .includeId()
+                    .includeName()
             }
             .includeStatus()
             .includePermissions()

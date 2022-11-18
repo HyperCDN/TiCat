@@ -49,7 +49,7 @@ class BoardManagement @Autowired constructor(
             .includeId()
             .includeTitle()
             .includeDescription()
-            .includeOwner() {
+            .includeOwner {
                 UserJson(selfUser)
                     .includeId()
             }
@@ -78,7 +78,7 @@ class BoardManagement @Autowired constructor(
             .includeId()
             .includeTitle()
             .includeDescription()
-            .includeOwner() {
+            .includeOwner {
                 UserJson(board.owner)
                     .includeId()
                     .includeName()

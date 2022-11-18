@@ -47,7 +47,7 @@ class MemberInfo @Autowired constructor(
         pagedData.entities = members.stream()
             .map {
                 MemberJson(it)
-                    .includeUser() {
+                    .includeUser {
                         UserJson(it.user)
                             .includeId()
                             .includeName()
@@ -74,7 +74,7 @@ class MemberInfo @Autowired constructor(
         val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return MemberJson(member)
-            .includeUser() {
+            .includeUser {
                 UserJson(member.user)
                     .includeId()
                     .includeName()
