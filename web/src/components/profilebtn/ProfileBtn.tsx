@@ -6,9 +6,11 @@ import {Button, IconButton, Menu, MenuItem, Typography} from "@mui/material";
 import {Link} from "react-router-dom";
 import "./ProfileBtn.scss"
 import {initializeLogin, logout} from "../../util/auth/Auth";
+import {User} from "../../static/entities/User";
 
 type StateProps = {
-    accessToken: string | null
+    accessToken?: string
+    selfUser?: User
 }
 
 type DispatchProps = {
@@ -27,8 +29,10 @@ type ComponentProps = StateProps & DispatchProps & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => {
     const accessToken = state.auth.accessToken
+    const selfUser = state.data.selfUser
     return {
-        accessToken
+        accessToken,
+        selfUser
     }
 }
 
@@ -44,13 +48,7 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
 
     render() {
 
-        if (this.props.accessToken == null){
-            return (
-                <div id="login-btn">
-                    <Button color="inherit" onClick={() => initializeLogin()}>Login</Button>
-                </div>
-            )
-        } else {
+        if (this.props.accessToken){
             return (
                 <div id="login-btn">
                     <IconButton
@@ -66,7 +64,7 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
                         open={Boolean(this.state.anchorEl)}
                         onClose={() => {this.setState({anchorEl: null})}}
                     >
-                        <MenuItem onClick={() => {this.setState({anchorEl: null})}} component={Link} to={'/profile'}>
+                        <MenuItem onClick={() => {this.setState({anchorEl: null})}} component={Link} to={'/profile/' + this.props.selfUser?.id}>
                             <Typography>Profile</Typography>
                         </MenuItem>
                         <MenuItem onClick={() => {
@@ -76,6 +74,12 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
                             <Typography>Logout</Typography>
                         </MenuItem>
                     </Menu>
+                </div>
+            )
+        } else {
+            return (
+                <div id="login-btn">
+                    <Button color="inherit" onClick={() => initializeLogin()}>Login</Button>
                 </div>
             )
         }

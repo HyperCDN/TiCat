@@ -25,8 +25,8 @@ class SecurityConfig {
                 it.requestMatchers( HttpMethod.PATCH,"" ).permitAll()
                 it.requestMatchers( HttpMethod.DELETE,"" ).permitAll()
                 // auth required
-                it.requestMatchers( HttpMethod.GET,"" ).authenticated()
-                it.requestMatchers( HttpMethod.POST,"/b", "/i/*", "/i/*/*" ).authenticated()
+                it.requestMatchers( HttpMethod.GET,"/jwt" ).authenticated()
+                it.requestMatchers( HttpMethod.POST,"/jwt", "/b", "/i/*", "/i/*/*" ).authenticated()
                 it.requestMatchers( HttpMethod.PATCH,"/b/*", "/m/*/*" ).authenticated()
                 it.requestMatchers( HttpMethod.DELETE,"/b/*", "/m/*/*" ).authenticated()
             }

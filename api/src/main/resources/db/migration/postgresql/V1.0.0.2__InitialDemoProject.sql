@@ -1,4 +1,4 @@
-BEGIN;
+START TRANSACTION;
 
     -- Add demo board
     INSERT INTO boards (board_id, title, description, ownership, visibility, access_mode)

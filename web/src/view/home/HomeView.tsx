@@ -41,7 +41,7 @@ class HomeView extends Component<ComponentProps, ComponentLocalState> {
             <div key="home-view" id="home-view">
                 <Hero title={"TiCat"}/>
                 <div id="home-view-container">
-                    AAAAAAAAAAAAAAAA
+
                 </div>
             </div>
         )

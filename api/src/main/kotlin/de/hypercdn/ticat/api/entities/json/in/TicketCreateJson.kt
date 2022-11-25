@@ -2,9 +2,7 @@ package de.hypercdn.ticat.api.entities.json.`in`
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.hypercdn.ticat.api.entities.sql.enums.TicketCategory
-import de.hypercdn.ticat.api.entities.sql.enums.TicketPriority
-import de.hypercdn.ticat.api.entities.sql.enums.TicketStatus
+import de.hypercdn.ticat.api.entities.sql.Ticket
 import java.util.*
 
 class TicketCreateJson {
@@ -29,15 +27,15 @@ class TicketCreateJson {
 
         @JsonProperty(value = "category", required = false)
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var category: TicketCategory? = null
+        var category: Ticket.Category? = null
 
         @JsonProperty(value = "priority", required = false)
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var priority: TicketPriority? = null
+        var priority: Ticket.Priority? = null
 
         @JsonProperty(value = "status", required = false)
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var status: TicketStatus? = null
+        var status: Ticket.Status? = null
 
     }
 

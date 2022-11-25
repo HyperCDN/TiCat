@@ -2,8 +2,7 @@ package de.hypercdn.ticat.api.entities.json.`in`
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
-import de.hypercdn.ticat.api.entities.sql.enums.BoardVisibility
+import de.hypercdn.ticat.api.entities.sql.Board
 
 class BoardCreateJson {
 
@@ -27,11 +26,11 @@ class BoardCreateJson {
 
         @JsonProperty(value = "visibility", required = false)
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var visibility: BoardVisibility? = null
+        var visibility: Board.Visibility? = null
 
         @JsonProperty(value = "accessMode", required = false)
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        var accessMode: BoardAccessMode? = null
+        var accessMode: Board.AccessMode? = null
 
     }
 

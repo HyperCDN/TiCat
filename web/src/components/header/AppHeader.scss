@@ -6,7 +6,7 @@
 
   #app-header-bar {
 
-    position: fixed;
+    position: sticky;
     background-color: $header-color;
     z-index: $app-bar-z-index;
     height: $app-bar-height;

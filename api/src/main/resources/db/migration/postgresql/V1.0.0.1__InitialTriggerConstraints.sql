@@ -1,4 +1,4 @@
-BEGIN;
+START TRANSACTION;
 
     -- Add default members when a new board has been inserted
     CREATE FUNCTION ADD_DEFAULT_BOARD_MEMBERS_FNT()
@@ -6,8 +6,6 @@ BEGIN;
         LANGUAGE plpgsql
     AS
     $$
-    DECLARE
-        maxID int := 0;
     BEGIN
         -- add owner as member
         INSERT into board_members (user_uuid, board_id, status, can_view, can_use, can_manage, can_administrate)

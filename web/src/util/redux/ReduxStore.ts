@@ -2,12 +2,14 @@ import {configureStore} from "@reduxjs/toolkit"
 import {enableMapSet} from "immer"
 import AuthSlice from "./slice/AuthSlice";
 import UISlice from "./slice/UISlice";
+import DataSlice from "./slice/DataSlice";
 enableMapSet()
 
 const reduxStore = configureStore({
     reducer: {
         auth: AuthSlice,
-        ui: UISlice
+        ui: UISlice,
+        data: DataSlice
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         serializableCheck: false

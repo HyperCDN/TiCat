@@ -1,8 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql
 
-import de.hypercdn.ticat.api.entities.sql.enums.TicketCategory
-import de.hypercdn.ticat.api.entities.sql.enums.TicketPriority
-import de.hypercdn.ticat.api.entities.sql.enums.TicketStatus
 import de.hypercdn.ticat.api.entities.sql.joinkeys.TicketId
 import jakarta.persistence.*
 import jakarta.persistence.Table
@@ -66,7 +63,7 @@ class Ticket() {
         nullable = false
     )
     @Enumerated(EnumType.STRING)
-    lateinit var category: TicketCategory
+    lateinit var category: Category
 
     @Column(
         name = "priority",
@@ -74,7 +71,7 @@ class Ticket() {
     )
     @ColumnDefault("NORMAL")
     @Enumerated(EnumType.STRING)
-    var priority: TicketPriority = TicketPriority.NORMAL
+    var priority: Priority = Priority.NORMAL
 
     @Column(
         name = "status",
@@ -82,7 +79,7 @@ class Ticket() {
     )
     @ColumnDefault("OPEN")
     @Enumerated(EnumType.STRING)
-    var status: TicketStatus = TicketStatus.OPEN
+    var status: Status = Status.OPEN
 
     @Column(
         name = "title",
@@ -108,5 +105,25 @@ class Ticket() {
     @JoinColumn(name = "assignee", referencedColumnName = "user_uuid",
         insertable = false, updatable = false)
     var assignee: User? = null
+
+    enum class Category {
+        EPIC,
+        BUG,
+        STORY
+    }
+
+    enum class Priority {
+        CRITICAL,
+        HIGH,
+        NORMAL,
+        LOW,
+        NONE
+    }
+
+    enum class Status {
+        OPEN,
+        CLOSED,
+        DELETED
+    }
 
 }

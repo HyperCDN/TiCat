@@ -4,17 +4,19 @@ import {connect} from "react-redux";
 import {withRouter, WithRouterProps} from "../../util/router/withRouter";
 import {setAuthDetails} from "../../util/redux/slice/AuthSlice";
 import {login} from "../../util/auth/Auth";
+import Hero from "../../components/hero/Hero";
+import "./AuthView.scss"
 
 
 type StateProps = {
-    resourceServerURL: string | null
-    clientId: string | null
-    accessToken: string | null
-    refreshToken: string | null
+    resourceServerURL?: string
+    clientId?: string
+    accessToken?: string
+    refreshToken?: string
 }
 
 type DispatchProps = {
-    setAuthDetails: (value: {access_token: string, refresh_token: string} | null) => void
+    setAuthDetails: (value: {access_token: string, refresh_token: string} | undefined) => void
 }
 
 type OwnProps = {
@@ -49,7 +51,7 @@ class AuthView extends Component<WithRouterProps<ComponentProps>, ComponentLocal
         const queryParams = new URLSearchParams(this.props.location.search)
         const authCode = queryParams.get('code')
         window.history.replaceState({}, document.title, window.location.pathname)
-        if (!(authCode == null || (this.props.accessToken != null || this.props.refreshToken != null))) {
+        if (!(authCode == null || (this.props.accessToken|| this.props.refreshToken))) {
             await login(authCode)
         }
         this.props.navigate("/", { replace: true })
@@ -57,9 +59,7 @@ class AuthView extends Component<WithRouterProps<ComponentProps>, ComponentLocal
 
     render() {
         return (
-            <div key="auth-view" id="auth-view">
-                Doing things to log you in ...
-            </div>
+            <div key="auth-view" id="auth-view"/>
         )
     }
 

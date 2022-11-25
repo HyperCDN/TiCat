@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.endpoints.auth
 
+import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.User
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,14 +22,14 @@ class JwtSyncEndpoints @Autowired constructor(
     val userRepository: UserRepository
 ) {
 
-    @GetMapping("/auth")
+    @GetMapping("/jwt")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun authTest(){
         // endpoint to be used to verify that an auth token is valid
     }
 
-    @PostMapping("/auth")
-    fun updateUserDetailsFromJwtContents(): User {
+    @PostMapping("/jwt")
+    fun updateUserDetailsFromJwtContents(): UserJson {
         try {
             val authentication = User.jwtAuthenticationToken()
             val user = User()
@@ -43,7 +44,9 @@ class JwtSyncEndpoints @Autowired constructor(
                     user.isAdmin = v.contains(adminRole)
                 }}
             }
-            return userRepository.save(user)
+            val savedUser = userRepository.save(user)
+            return UserJson(savedUser)
+                .includeAll()
         }catch (e: IllegalAccessException) {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal auth failure")
         }

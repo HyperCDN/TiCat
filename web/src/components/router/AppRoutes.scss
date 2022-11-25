@@ -1,6 +1,8 @@
+@import "../../static/scss/TiCat.scss";
+
 #app-routes {
 
-  height: 100%; // $app-bar-height
+  height: calc(100% - #{$app-bar-height});
   padding: 0;
 
 }

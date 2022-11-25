@@ -1,8 +1,7 @@
 package de.hypercdn.ticat.api.entities.sql
 
-import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
-import de.hypercdn.ticat.api.entities.sql.enums.BoardVisibility
 import jakarta.persistence.*
+import jakarta.persistence.Table
 import org.hibernate.annotations.*
 import java.time.LocalDateTime
 import java.util.*
@@ -62,7 +61,7 @@ class Board() {
     )
     @ColumnDefault("MEMBERS_ONLY")
     @Enumerated(EnumType.STRING)
-    var visibility: BoardVisibility = BoardVisibility.MEMBERS_ONLY
+    var visibility: Visibility = Visibility.MEMBERS_ONLY
 
     @Column(
         name = "access_mode",
@@ -70,10 +69,22 @@ class Board() {
     )
     @ColumnDefault("MANUAL_ADD")
     @Enumerated(EnumType.STRING)
-    var accessMode: BoardAccessMode = BoardAccessMode.MANUAL_ADD
+    var accessMode: AccessMode = AccessMode.MANUAL_ADD
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     var members: List<Member> = emptyList()
+
+    enum class AccessMode {
+        PUBLIC_JOIN,
+        MANUAL_VERIFY,
+        MANUAL_ADD
+    }
+
+    enum class Visibility {
+        ANYONE,
+        LOGGED_IN_USER,
+        MEMBERS_ONLY
+    }
 
 }

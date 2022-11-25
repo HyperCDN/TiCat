@@ -1,5 +1,6 @@
 import reduxStore from "../redux/ReduxStore";
 import {setAuthDetails} from "../redux/slice/AuthSlice";
+import {User} from "../../static/entities/User";
 
 export const ROOT_URI = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
 
@@ -55,8 +56,8 @@ export async function login(code: string){
         })
         .then(oidcToken => {
             reduxStore.dispatch(setAuthDetails(oidcToken))
-            updateUserInfo()
         })
+        .then(() => updateUserInfo())
         .catch(e => {
             console.error(e)
         })
@@ -86,10 +87,10 @@ export async function refresh(){
         })
         .then(oidcToken => {
             reduxStore.dispatch(setAuthDetails(oidcToken))
-            return updateUserInfo()
         })
+        .then(() => updateUserInfo())
         .catch(e => {
-            reduxStore.dispatch(setAuthDetails(null))
+            reduxStore.dispatch(setAuthDetails(undefined))
             console.error(e)
         })
 }
@@ -110,22 +111,22 @@ export async function logout(){
                 })
             })
             .then(() => {
-                reduxStore.dispatch(setAuthDetails(null))
+                reduxStore.dispatch(setAuthDetails(undefined))
             })
-        }).catch(()=>{})
+        }).catch(e => console.error(e))
 }
 
 export async function testAuth(){
     if(reduxStore.getState().auth.accessToken){
         console.log("Testing auth...")
-        await fetch('/api/user/test', {
+        await fetch('/api/jwt', {
             headers: {
                 "Authorization": "Bearer " + reduxStore.getState().auth.accessToken!
             }
         })
         .then(r => {
             if(!r.ok){
-                refresh()
+                return refresh()
             }
         })
         .catch(() => logout())
@@ -135,7 +136,7 @@ export async function testAuth(){
 
 export async function updateUserInfo(){
     console.log("Updating user info...")
-    await fetch('/api/user/sync', {
+    await fetch('/api/jwt', {
         method: "POST",
         headers: {
             "Authorization": "Bearer " + reduxStore.getState().auth.accessToken!
@@ -145,9 +146,7 @@ export async function updateUserInfo(){
         if(r.ok) {
             throw new Error()
         }
-        return r.json()
+        return r.json() as User
     })
-    .catch(() => {
-        console.error("Failed to update user info")
-    })
+    .catch(e => console.error(e))
 }

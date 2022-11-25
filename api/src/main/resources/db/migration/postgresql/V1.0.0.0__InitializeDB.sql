@@ -1,4 +1,4 @@
-BEGIN;
+START TRANSACTION;
 
     -- Representing a logged in user; Used to store additional configurations and permissions away from the auth provider
     CREATE TABLE users

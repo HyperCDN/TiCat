@@ -36,14 +36,6 @@ class NotFoundView extends Component<ComponentProps, ComponentLocalState> {
 
     }
 
-    componentDidMount() {
-        console.log("e")
-    }
-
-    componentWillUnmount() {
-        console.log("u")
-    }
-
     render() {
         return (
             <div key="not-found-view" id="not-found-view">

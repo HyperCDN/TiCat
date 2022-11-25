@@ -1,6 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql
 
-import de.hypercdn.ticat.api.entities.sql.enums.BoardMembershipStatus
 import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import jakarta.persistence.*
 import jakarta.persistence.Table
@@ -58,7 +57,7 @@ class Member() {
     )
     @ColumnDefault("BLOCKED")
     @Enumerated(EnumType.STRING)
-    lateinit var status: BoardMembershipStatus
+    lateinit var status: MembershipStatus
 
     @Column(
         name = "can_view",
@@ -87,5 +86,12 @@ class Member() {
     )
     @ColumnDefault("false")
     var canAdministrate: Boolean = false
+
+    enum class MembershipStatus {
+        REQUESTED,
+        OFFERED,
+        GRANTED,
+        BLOCKED
+    }
 
 }

@@ -4,9 +4,8 @@ import de.hypercdn.ticat.api.entities.helper.*
 import de.hypercdn.ticat.api.entities.json.`in`.MemberUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.MemberJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
+import de.hypercdn.ticat.api.entities.sql.Board
 import de.hypercdn.ticat.api.entities.sql.Member
-import de.hypercdn.ticat.api.entities.sql.enums.BoardAccessMode
-import de.hypercdn.ticat.api.entities.sql.enums.BoardMembershipStatus
 import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
@@ -32,8 +31,8 @@ class MemberManagement @Autowired constructor(
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMembership = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
         if (selfMembership != null) {
-            if (selfMembership.status != BoardMembershipStatus.OFFERED) return
-            selfMembership.status = BoardMembershipStatus.GRANTED
+            if (selfMembership.status != Member.MembershipStatus.OFFERED) return
+            selfMembership.status = Member.MembershipStatus.GRANTED
             selfMembership.canView = true
             memberRepository.save(selfMembership)
             return
@@ -45,8 +44,8 @@ class MemberManagement @Autowired constructor(
         membershipRequest.boardId = board.id
         membershipRequest.userUUID = selfUser.uuid
         membershipRequest.status = when (board.accessMode) {
-            BoardAccessMode.PUBLIC_JOIN -> BoardMembershipStatus.GRANTED
-            BoardAccessMode.MANUAL_VERIFY -> BoardMembershipStatus.REQUESTED
+            Board.AccessMode.PUBLIC_JOIN -> Member.MembershipStatus.GRANTED
+            Board.AccessMode.MANUAL_VERIFY -> Member.MembershipStatus.REQUESTED
             else -> throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
         membershipRequest.canView = true
@@ -71,10 +70,10 @@ class MemberManagement @Autowired constructor(
             invitedMember = Member()
             invitedMember.boardId = board.id
             invitedMember.userUUID = invitedUser.uuid
-            invitedMember.status = BoardMembershipStatus.OFFERED
+            invitedMember.status = Member.MembershipStatus.OFFERED
             invitedMember = memberRepository.save(invitedMember)
-        } else if (invitedMember.status == BoardMembershipStatus.REQUESTED){
-            invitedMember.status = BoardMembershipStatus.GRANTED
+        } else if (invitedMember.status == Member.MembershipStatus.REQUESTED){
+            invitedMember.status = Member.MembershipStatus.GRANTED
             invitedMember.canView = true
             invitedMember = memberRepository.save(invitedMember)
         }
@@ -102,7 +101,7 @@ class MemberManagement @Autowired constructor(
         }
         val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        requestBody.block?.let { if (selfMember.hasEffectiveAdministrationPower() && it) member.status = BoardMembershipStatus.BLOCKED }
+        requestBody.block?.let { if (selfMember.hasEffectiveAdministrationPower() && it) member.status = Member.MembershipStatus.BLOCKED }
         requestBody.permissions?.let {
             it.canView?.let { v -> member.canView = v }
             it.canUse?.let { v -> member.canUse = v }
@@ -133,7 +132,7 @@ class MemberManagement @Autowired constructor(
         }
         val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        if (member.status != BoardMembershipStatus.BLOCKED){
+        if (member.status != Member.MembershipStatus.BLOCKED){
             memberRepository.delete(member)
         }
     }

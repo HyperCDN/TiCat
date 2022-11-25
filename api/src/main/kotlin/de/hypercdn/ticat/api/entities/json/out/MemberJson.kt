@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.hypercdn.ticat.api.entities.sql.Member
-import de.hypercdn.ticat.api.entities.sql.enums.BoardMembershipStatus
 import java.util.function.Supplier
 
 class MemberJson(
@@ -22,7 +21,7 @@ class MemberJson(
 
     @JsonProperty(value = "status", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    var status: BoardMembershipStatus? = null
+    var status: Member.MembershipStatus? = null
 
     @JsonProperty(value = "permissions", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -9,7 +9,6 @@ import de.hypercdn.ticat.api.entities.json.`in`.TicketUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.TicketJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.Ticket
-import de.hypercdn.ticat.api.entities.sql.enums.TicketStatus
 import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import de.hypercdn.ticat.api.entities.sql.joinkeys.TicketId
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
@@ -126,7 +125,7 @@ class TicketManagement @Autowired constructor(
             ticketRepository.delete(ticket)
             return null
         } else {
-            ticket.status = TicketStatus.CLOSED
+            ticket.status = Ticket.Status.CLOSED
             val savedTicket = ticketRepository.save(ticket)
             return TicketJson(savedTicket)
                 .includeId()
