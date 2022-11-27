@@ -3,6 +3,9 @@ import {Component} from "react";
 import {connect} from "react-redux";
 import Hero from "../../components/hero/Hero";
 import "./HomeView.scss"
+import {Board} from "../../static/entities/Board";
+import {boardCache} from "../../util/redux/slice/BoardCache";
+import {getAllAvailableBoards} from "../../util/api/Board_Endpoints";
 
 type StateProps = {
 
@@ -17,7 +20,7 @@ type OwnProps = {
 }
 
 type ComponentLocalState = {
-
+    boards?: Board[]
 }
 
 type ComponentProps = StateProps & DispatchProps & OwnProps
@@ -33,18 +36,33 @@ const mapDispatchToProps: DispatchProps = {
 class HomeView extends Component<ComponentProps, ComponentLocalState> {
 
     state = {
+        boards: undefined
+    }
 
+    componentDidMount() {
+        getAllAvailableBoards()
+            .then(boards => {
+                this.setState({
+                    boards: boards
+                })
+            })
     }
 
     render() {
-        return (
-            <div key="home-view" id="home-view">
-                <Hero title={"TiCat"}/>
-                <div id="home-view-container">
-
+        if (this.state.boards) {
+            return (
+                <div key="home-view" id="home-view">
+                    Now we got something! <br/>
+                    {JSON.stringify(this.state.boards)}
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div key="home-view" id="home-view">
+                    <Hero title={"TiCat"}/>
+                </div>
+            )
+        }
     }
 
 }

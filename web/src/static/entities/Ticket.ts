@@ -17,3 +17,27 @@ export type Ticket = {
         status?: TicketStatus
     }
 }
+
+export type TicketCreate = {
+    title: string,
+    content?: string,
+    assignee?: User,
+    properties?: {
+        category?: TicketCategory,
+        priority?: TicketPriority,
+        status?: TicketStatus
+    }
+}
+
+
+export type TicketUpdate = {
+    id: number,
+    title?: string,
+    content?: string,
+    assignee?: User,
+    properties?: {
+        category?: TicketCategory,
+        priority?: TicketPriority,
+        status?: TicketStatus
+    }
+}

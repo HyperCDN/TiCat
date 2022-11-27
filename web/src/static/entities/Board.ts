@@ -14,3 +14,22 @@ export type Board = {
     },
     members?: Member[]
 }
+
+export type BoardCreate = {
+    id: string,
+    title: string,
+    description?: string,
+    settings?: {
+        visibility?: BoardVisibility,
+        accessMode?: BoardAccessMode,
+    },
+}
+
+export type BoardUpdate = {
+    title: string,
+    description?: string,
+    settings?: {
+        visibility?: BoardVisibility,
+        accessMode?: BoardAccessMode,
+    },
+}

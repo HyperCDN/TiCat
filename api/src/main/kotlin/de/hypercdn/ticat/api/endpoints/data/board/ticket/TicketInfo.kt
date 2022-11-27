@@ -51,6 +51,10 @@ class TicketInfo @Autowired constructor(
                 TicketJson(it)
                     .includeId()
                     .includeTitle()
+                    .includeBoard {
+                        BoardJson(it.board)
+                            .includeId()
+                    }
                     .includeCreator {
                         UserJson(it.creator)
                             .includeId()

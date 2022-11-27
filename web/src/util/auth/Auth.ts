@@ -5,7 +5,7 @@ import {User} from '../../static/entities/User';
 export const ROOT_URI = window.location.protocol + `//` + window.location.hostname + (window.location.port ? `:` + window.location.port : ``)
 
 export async function getOIDCConfig() {
-    return fetch(reduxStore.getState().auth.resourceServerURL + `/.well-known/openid-configuration`)
+    return fetch(`${reduxStore.getState().auth.resourceServerURL}/.well-known/openid-configuration`)
         .then(r => {
             if(!r.ok){
                 throw new Error(`failed to get configuration from api`)
@@ -122,7 +122,7 @@ export async function testAuth(){
         return fetch(`/api/jwt`, {
             headers: reduxStore.getState().auth.accessToken ? {
                 'Authorization': `Bearer ${reduxStore.getState().auth.accessToken}`
-            }:{}
+            } : undefined
         })
         .then(r => {
             if(!r.ok){
@@ -140,7 +140,7 @@ export async function updateUserInfo(){
         method: `POST`,
         headers: reduxStore.getState().auth.accessToken ? {
             'Authorization': `Bearer ${reduxStore.getState().auth.accessToken}`
-        }:{}
+        } : undefined
     })
     .then(r => {
         if(!r.ok) {

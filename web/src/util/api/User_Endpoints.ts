@@ -14,7 +14,7 @@ export async function getDataForUserWithId(uuid: string, cache: boolean = true) 
         method: `GET`,
         headers: reduxStore.getState().auth.accessToken ? {
             'Authorization': `Bearer ${reduxStore.getState().auth.accessToken}`
-        }: {}
+        } : undefined
     })
     .then(r => {
         if (!r.ok) {

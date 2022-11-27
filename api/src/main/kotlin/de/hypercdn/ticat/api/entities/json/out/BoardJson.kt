@@ -43,10 +43,6 @@ class BoardJson(
 
     }
 
-    @JsonProperty(value = "members", required = false)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    var members: List<MemberJson>? = null
-
     fun includeId(skip: Boolean = false): BoardJson {
         if (skip) return this
         id = board?.id
@@ -82,12 +78,6 @@ class BoardJson(
         val tmp = Settings()
         tmp.visibility = board?.visibility
         tmp.accessMode = board?.accessMode
-        return this
-    }
-
-    fun includeMembers(skip: Boolean = false, memberSupplier: Supplier<List<MemberJson>>? = null): BoardJson {
-        if (skip) return this
-        members = memberSupplier?.get()
         return this
     }
 
