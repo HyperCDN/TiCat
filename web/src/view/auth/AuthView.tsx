@@ -4,7 +4,6 @@ import {connect} from "react-redux";
 import {withRouter, WithRouterProps} from "../../util/router/withRouter";
 import {setAuthDetails} from "../../util/redux/slice/AuthSlice";
 import {login} from "../../util/auth/Auth";
-import Hero from "../../components/hero/Hero";
 import "./AuthView.scss"
 
 

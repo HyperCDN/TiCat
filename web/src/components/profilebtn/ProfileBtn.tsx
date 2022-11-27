@@ -6,11 +6,10 @@ import {Button, IconButton, Menu, MenuItem, Typography} from "@mui/material";
 import {Link} from "react-router-dom";
 import "./ProfileBtn.scss"
 import {initializeLogin, logout} from "../../util/auth/Auth";
-import {User} from "../../static/entities/User";
+import jwtDecode, {JwtPayload} from "jwt-decode";
 
 type StateProps = {
     accessToken?: string
-    selfUser?: User
 }
 
 type DispatchProps = {
@@ -29,10 +28,8 @@ type ComponentProps = StateProps & DispatchProps & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => {
     const accessToken = state.auth.accessToken
-    const selfUser = state.data.selfUser
     return {
-        accessToken,
-        selfUser
+        accessToken
     }
 }
 
@@ -49,6 +46,7 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
     render() {
 
         if (this.props.accessToken){
+            const selfUserId = jwtDecode<JwtPayload>(this.props.accessToken)["sub"];
             return (
                 <div id="login-btn">
                     <IconButton
@@ -64,7 +62,7 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
                         open={Boolean(this.state.anchorEl)}
                         onClose={() => {this.setState({anchorEl: null})}}
                     >
-                        <MenuItem onClick={() => {this.setState({anchorEl: null})}} component={Link} to={'/profile/' + this.props.selfUser?.id}>
+                        <MenuItem onClick={() => {this.setState({anchorEl: null})}} component={Link} to={'/profile/' + selfUserId}>
                             <Typography>Profile</Typography>
                         </MenuItem>
                         <MenuItem onClick={() => {

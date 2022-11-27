@@ -25,9 +25,7 @@ fetch('/api/config')
 })
 .then(() => {
     // test auth
-    setInterval(() => {
-        testAuth()
-    }, 1000 * 30)
+    setInterval(() => testAuth(), 1000 * 30)
 })
 .then(() => {
     root.render(

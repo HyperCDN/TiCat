@@ -1,30 +1,30 @@
-import reduxStore from "../redux/ReduxStore";
-import {setAuthDetails} from "../redux/slice/AuthSlice";
-import {User} from "../../static/entities/User";
+import reduxStore from '../redux/ReduxStore';
+import {setAuthDetails} from '../redux/slice/AuthSlice';
+import {User} from '../../static/entities/User';
 
-export const ROOT_URI = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
+export const ROOT_URI = window.location.protocol + `//` + window.location.hostname + (window.location.port ? `:` + window.location.port : ``)
 
 export async function getOIDCConfig() {
-    return fetch(reduxStore.getState().auth.resourceServerURL + '/.well-known/openid-configuration')
+    return fetch(reduxStore.getState().auth.resourceServerURL + `/.well-known/openid-configuration`)
         .then(r => {
             if(!r.ok){
-                throw new Error('Failed to get configuration from api')
+                throw new Error(`failed to get configuration from api`)
             }
             return r.json()
         })
 }
 
 export async function initializeLogin() {
-    console.log("Initializing login...")
-    await getOIDCConfig()
+    console.log(`initializing login`)
+    return getOIDCConfig()
         .then(oidcConfig => {
             const requestParams =
-                '?response_type=code' +
-                '&client_id=' + reduxStore.getState().auth.clientId +
-                '&login=true' +
-                '&scope=openid profile email' +
-                '&redirect_uri=' + encodeURI(ROOT_URI + '/auth_response')
-            window.location.href = oidcConfig['authorization_endpoint'] + requestParams
+                `?response_type=code` +
+                `&client_id=${reduxStore.getState().auth.clientId}` +
+                `&login=true` +
+                `&scope=openid profile email` +
+                `&redirect_uri=${encodeURI( `${ROOT_URI}/auth_response`)}`
+            window.location.href = oidcConfig[`authorization_endpoint`] + requestParams
         })
         .catch(e => {
             console.error(e)
@@ -32,19 +32,19 @@ export async function initializeLogin() {
 }
 
 export async function login(code: string){
-    console.log("Verifying auth code...")
-    await getOIDCConfig()
+    console.log(`verifying auth code`)
+    return getOIDCConfig()
         .then(oidcConfig => {
-            return fetch(oidcConfig['token_endpoint'], {
-                method: 'POST',
+            return fetch(oidcConfig[`token_endpoint`], {
+                method: `POST`,
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': `application/x-www-form-urlencoded`
                 },
                 body: new URLSearchParams({
-                    'grant_type': 'authorization_code',
-                    'client_id': reduxStore.getState().auth.clientId!,
+                    'grant_type': `authorization_code`,
+                    'client_id': `${reduxStore.getState().auth.clientId!}`,
                     'code': code,
-                    'redirect_uri': encodeURI(ROOT_URI + '/auth_response')
+                    'redirect_uri': encodeURI(`${ROOT_URI}/auth_response`)
                 })
             })
             .then(r => {
@@ -64,23 +64,23 @@ export async function login(code: string){
 }
 
 export async function refresh(){
-    console.log("Updating jwt...")
-    await getOIDCConfig()
+    console.log(`updating jwt`)
+    return getOIDCConfig()
         .then(oidcConfig => {
-            return fetch(oidcConfig['token_endpoint'], {
-                method: 'POST',
+            return fetch(oidcConfig[`token_endpoint`], {
+                method: `POST`,
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': `application/x-www-form-urlencoded`
                 },
                 body: new URLSearchParams({
-                    'grant_type': 'refresh_token',
+                    'grant_type': `refresh_token`,
                     'client_id': reduxStore.getState().auth.clientId!,
                     'refresh_token': reduxStore.getState().auth.refreshToken!
                 })
             })
             .then(r => {
                 if(!r.ok){
-                    throw new Error("Failed to refresh jwt")
+                    throw new Error(`failed to refresh jwt`)
                 }
                 return r.json()
             })
@@ -96,18 +96,18 @@ export async function refresh(){
 }
 
 export async function logout(){
-    console.log("Logging out...")
-    await getOIDCConfig()
+    console.log(`logging out`)
+    return getOIDCConfig()
         .then(oidcConfig => {
-            return fetch(oidcConfig['end_session_endpoint'], {
-                method: 'POST',
+            return fetch(oidcConfig[`end_session_endpoint`], {
+                method: `POST`,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: new URLSearchParams({
                     'client_id': reduxStore.getState().auth.clientId!,
                     'refresh_token': reduxStore.getState().auth.refreshToken!,
-                    'redirect_uri': encodeURI(ROOT_URI + '/')
+                    'redirect_uri': encodeURI(`${ROOT_URI}/`)
                 })
             })
             .then(() => {
@@ -118,11 +118,11 @@ export async function logout(){
 
 export async function testAuth(){
     if(reduxStore.getState().auth.accessToken){
-        console.log("Testing auth...")
-        await fetch('/api/jwt', {
-            headers: {
-                "Authorization": "Bearer " + reduxStore.getState().auth.accessToken!
-            }
+        console.log(`testing auth`)
+        return fetch(`/api/jwt`, {
+            headers: reduxStore.getState().auth.accessToken ? {
+                'Authorization': `Bearer ${reduxStore.getState().auth.accessToken}`
+            }:{}
         })
         .then(r => {
             if(!r.ok){
@@ -135,16 +135,16 @@ export async function testAuth(){
 }
 
 export async function updateUserInfo(){
-    console.log("Updating user info...")
-    await fetch('/api/jwt', {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer " + reduxStore.getState().auth.accessToken!
-        }
+    console.log(`syncing user info with api`)
+    return fetch('/api/jwt', {
+        method: `POST`,
+        headers: reduxStore.getState().auth.accessToken ? {
+            'Authorization': `Bearer ${reduxStore.getState().auth.accessToken}`
+        }:{}
     })
     .then(r => {
-        if(r.ok) {
-            throw new Error()
+        if(!r.ok) {
+            throw new Error(`failed to sync user info with api`)
         }
         return r.json() as User
     })

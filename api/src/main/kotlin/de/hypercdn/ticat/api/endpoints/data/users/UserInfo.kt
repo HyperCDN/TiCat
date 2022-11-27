@@ -17,17 +17,6 @@ class UserInfo @Autowired constructor(
     val userRepository: UserRepository
 ){
 
-    @GetMapping("/u/@")
-    fun getOwnUserInfo(): UserJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        return UserJson(selfUser)
-            .includeId()
-            .includeFullName()
-            .includeEmail()
-            .includePermissions()
-
-    }
-
     @GetMapping("/u/{userUUID}")
     fun getUserInfo(
         @PathVariable("userUUID") userUUID: UUID

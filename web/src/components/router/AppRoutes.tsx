@@ -6,6 +6,8 @@ import HomeView from "../../view/home/HomeView";
 import "./AppRoutes.scss";
 import AuthView from "../../view/auth/AuthView";
 import {Route, Routes} from "react-router";
+import ProfileView from "../../view/profile/ProfileView";
+import BoardView from "../../view/board/BoardView";
 
 type StateProps = {
 
@@ -45,6 +47,8 @@ class AppRoutes extends Component<ComponentProps, ComponentLocalState> {
                 <Routes>
                     <Route path={'/'} element={<HomeView/>}/>
                     <Route path={'/auth_response'} element={<AuthView/>}/>
+                    <Route path={'/profile/:userUUID'} element={<ProfileView/>}/>
+                    <Route path={'/board/:boardId'} element={<BoardView/>}/>
                     <Route path={'*'} element={<NotFoundView/>}/>
                 </Routes>
             </div>
