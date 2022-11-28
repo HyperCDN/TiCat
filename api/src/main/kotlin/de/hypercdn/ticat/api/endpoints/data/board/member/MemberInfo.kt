@@ -4,17 +4,20 @@ import de.hypercdn.ticat.api.entities.helper.getBoardIfExists
 import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackWhenAllowed
 import de.hypercdn.ticat.api.entities.helper.hasEffectiveManagementPower
 import de.hypercdn.ticat.api.entities.helper.isVisibleTo
+import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.MemberJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.json.out.helper.PagedData
-import de.hypercdn.ticat.api.entities.sql.User
 import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
+import jakarta.validation.constraints.Min
+import org.hibernate.validator.constraints.Range
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -30,10 +33,11 @@ class MemberInfo @Autowired constructor(
 ) {
 
     @GetMapping("/m/{boardId}")
+    @Validated
     fun getMembers(
         @PathVariable("boardId") boardId: String,
-        @RequestParam("page", required = false, defaultValue = "0") page: Int,
-        @RequestParam("chunkSize", required = false, defaultValue = "50") chunkSize: Int
+        @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
+        @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
     ): PagedData<MemberJson> {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
@@ -41,7 +45,7 @@ class MemberInfo @Autowired constructor(
         if(!board.isVisibleTo(selfUser, selfMember)){
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
-        val pageRequest = PageRequest.of(page.coerceAtLeast(0), chunkSize.coerceIn(1, 50))
+        val pageRequest = PageRequest.of(page, chunkSize)
         val members = memberRepository.getMembersOf(board, pageRequest, !selfMember.hasEffectiveManagementPower())
         val pagedData = PagedData<MemberJson>(pageRequest)
         pagedData.entities = members.stream()
@@ -51,9 +55,12 @@ class MemberInfo @Autowired constructor(
                         UserJson(it.user)
                             .includeId()
                             .includeName()
-                            .includeFullName(skip = !User.isAuthenticated())
                     }
-                    .includePermissions(skip = !selfMember.hasEffectiveManagementPower())
+                    .includeBoard {
+                        BoardJson(it.board)
+                            .includeId()
+                    }
+                    .includePermissions(skip = selfMember.userUUID != selfUser.uuid && !selfMember.hasEffectiveManagementPower())
                     .includeStatus(skip = !selfMember.hasEffectiveManagementPower())
             }
             .toList()
@@ -78,9 +85,12 @@ class MemberInfo @Autowired constructor(
                 UserJson(member.user)
                     .includeId()
                     .includeName()
-                    .includeFullName(skip = !User.isAuthenticated())
             }
-            .includePermissions(skip = !selfMember.hasEffectiveManagementPower())
+            .includeBoard {
+                BoardJson(member.board)
+                    .includeId()
+            }
+            .includePermissions(skip = selfMember.userUUID != selfUser.uuid && !selfMember.hasEffectiveManagementPower())
             .includeStatus(skip = !selfMember.hasEffectiveManagementPower())
     }
 

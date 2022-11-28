@@ -14,9 +14,12 @@ import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
+import jakarta.validation.constraints.Min
+import org.hibernate.validator.constraints.Range
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -32,10 +35,11 @@ class TicketInfo @Autowired constructor(
 ) {
 
     @GetMapping("/t/{boardId}")
+    @Validated
     fun getTickets(
         @PathVariable("boardId") boardId: String,
-        @RequestParam("page", required = false, defaultValue = "0") page: Int,
-        @RequestParam("chunkSize", required = false, defaultValue = "50") chunkSize: Int
+        @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
+        @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
     ): PagedData<TicketJson> {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val board = boardRepository.getBoardIfExists(boardId)
@@ -43,7 +47,7 @@ class TicketInfo @Autowired constructor(
         if (!board.isVisibleTo(selfUser, selfMember)){
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
-        val pageRequest = PageRequest.of(page.coerceAtLeast(0), chunkSize.coerceIn(1, 50))
+        val pageRequest = PageRequest.of(page, chunkSize)
         val tickets = ticketRepository.getTicketsOf(board, pageRequest)
         val pagedData = PagedData<TicketJson>(pageRequest)
         pagedData.entities = tickets.stream()
@@ -88,10 +92,12 @@ class TicketInfo @Autowired constructor(
             .includeCreator {
                 UserJson(ticket.creator)
                     .includeId()
+                    .includeName()
             }
             .includeAssignee(skip = ticket.assigneeUUID == null) {
                 UserJson(ticket.assignee)
                     .includeId()
+                    .includeName()
             }
             .includeContent()
             .includeProperties()

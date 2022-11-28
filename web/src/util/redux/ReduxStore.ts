@@ -2,16 +2,14 @@ import {configureStore} from "@reduxjs/toolkit"
 import {enableMapSet} from "immer"
 import AuthSlice from "./slice/AuthSlice";
 import UISlice from "./slice/UISlice";
-import UserCache from "./slice/UserCache";
-import BoardCache from "./slice/BoardCache";
+import DataCache from "./slice/DataCache";
 enableMapSet()
 
 const reduxStore = configureStore({
     reducer: {
         auth: AuthSlice,
         ui: UISlice,
-        userCache: UserCache,
-        boardCache: BoardCache
+        data: DataCache
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         serializableCheck: false

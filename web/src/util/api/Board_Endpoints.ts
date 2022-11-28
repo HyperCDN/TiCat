@@ -1,16 +1,16 @@
 import reduxStore from "../redux/ReduxStore";
-import {Board, BoardCreate, BoardUpdate} from "../../static/entities/Board";
-import {removeBoardFromCache, updateCachedBoard} from "../redux/slice/BoardCache";
-import {Paged} from "../../static/entities/Paged";
+import {removeBoardFromCache, updateCachedBoard} from "../redux/slice/DataCache";
+import {Board, BoardCreate, BoardUpdate} from "./entities/Board";
+import {Paged} from "./entities/Paged";
 
-export async function getAllAvailableBoards(chunk: number = 25, cacheResult: boolean = true) {
+export async function getAllAvailableBoards(chunk: number = 50, cacheResult: boolean = true) {
     console.log(`getting all available boards in chunks`)
     let boards: Board[] = []
     let page = 0
     while (true) {
         const paged = await getAvailableBoards(page++, chunk, cacheResult)
         paged.entities.forEach(board => boards.push(board))
-        if (paged.entities.length < chunk) break;
+        if (paged.entities.length < paged.chunkSize) break;
     }
     return boards
 }
@@ -24,15 +24,11 @@ export async function getAvailableBoards(page: number, chunk: number, cacheResul
         } : undefined
     })
     .then(r => {
-        if (!r.ok) {
-            throw Error(`fetching boards from api failed with status ${r.status}`)
-        }
+        if (!r.ok) throw Error(`fetching boards from api failed with status ${r.status}`)
         return r.json() as unknown as Paged<Board>
     })
     .then(paged => {
-        if (cacheResult) {
-            paged.entities.forEach(board => reduxStore.dispatch(updateCachedBoard(board)))
-        }
+        if (cacheResult) paged.entities.forEach(board => reduxStore.dispatch(updateCachedBoard(board)))
         return paged
     })
 }
@@ -40,7 +36,7 @@ export async function getAvailableBoards(page: number, chunk: number, cacheResul
 export async function getBoardInfo(id: string, useCache: boolean = false, cacheResult: boolean = true) {
     console.log(`getting data for board with id %s`, id.toUpperCase())
     if (useCache) {
-        const boardCache = reduxStore.getState().boardCache.boards
+        const boardCache = reduxStore.getState().data.boards
         let board = boardCache.get(id.toUpperCase())
         if(board) {
             console.log(`found cached entity for board with id %s`, id)
@@ -54,15 +50,11 @@ export async function getBoardInfo(id: string, useCache: boolean = false, cacheR
         } : undefined
     })
     .then(r => {
-        if (!r.ok) {
-            throw Error(`fetching board from api failed with status ${r.status}`)
-        }
+        if (!r.ok) throw Error(`fetching board from api failed with status ${r.status}`)
         return r.json() as Board
     })
     .then(board => {
-        if (cacheResult) {
-            reduxStore.dispatch(updateCachedBoard(board))
-        }
+        if (cacheResult) reduxStore.dispatch(updateCachedBoard(board))
         return board
     })
 }
@@ -78,15 +70,11 @@ export async function createNewBoard(template: BoardCreate, cacheResult: boolean
         body: JSON.stringify(template)
     })
     .then(r => {
-        if(!r.ok) {
-            throw Error(`creating board failed with status ${r.status}`)
-        }
+        if(!r.ok) throw Error(`creating board failed with status ${r.status}`)
         return r.json() as Board
     })
     .then(board => {
-        if (cacheResult) {
-            reduxStore.dispatch(updateCachedBoard(board))
-        }
+        if (cacheResult) reduxStore.dispatch(updateCachedBoard(board))
         return board
     })
 }
@@ -102,15 +90,11 @@ export async function updateBoard(id: string, template: BoardUpdate, cacheResult
         body: JSON.stringify(template)
     })
     .then(r => {
-        if(!r.ok) {
-            throw Error(`updating board failed with status ${r.status}`)
-        }
+        if(!r.ok) throw Error(`updating board failed with status ${r.status}`)
         return r.json() as Board
     })
     .then(board => {
-        if (cacheResult) {
-            reduxStore.dispatch(updateCachedBoard(board))
-        }
+        if (cacheResult) reduxStore.dispatch(updateCachedBoard(board))
         return board
     })
 }

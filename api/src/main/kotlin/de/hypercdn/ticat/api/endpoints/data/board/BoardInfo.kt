@@ -9,9 +9,12 @@ import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
+import jakarta.validation.constraints.Min
+import org.hibernate.validator.constraints.Range
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -26,12 +29,13 @@ class BoardInfo @Autowired constructor(
 ) {
 
     @GetMapping("/b")
+    @Validated
     fun getAvailableBoards(
-        @RequestParam("page", required = false, defaultValue = "0") page: Int,
-        @RequestParam("chunkSize", required = false, defaultValue = "25") chunkSize: Int
+        @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
+        @RequestParam("chunkSize", required = false, defaultValue = "50") @Range(min = 1, max = 50) chunkSize: Int
     ): PagedData<BoardJson> {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
-        val pageRequest = PageRequest.of(page.coerceAtLeast(0), chunkSize.coerceIn(1, 25))
+        val pageRequest = PageRequest.of(page, chunkSize)
         val boards = boardRepository.getBoardsAvailableTo(selfUser)
         val paged = PagedData<BoardJson>(pageRequest)
         paged.entities = boards.stream()

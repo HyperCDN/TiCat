@@ -3,8 +3,8 @@ import {Component} from "react";
 import {connect} from "react-redux";
 import {withRouter, WithRouterProps} from "../../util/router/withRouter";
 import {setAuthDetails} from "../../util/redux/slice/AuthSlice";
-import {login} from "../../util/auth/Auth";
 import "./AuthView.scss"
+import {login} from "../../util/api/Auth_Endpoint";
 
 
 type StateProps = {

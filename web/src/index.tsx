@@ -6,7 +6,7 @@ import reduxStore from './util/redux/ReduxStore';
 import App from "./components/App";
 import {setResourceServerURL} from "./util/redux/slice/AuthSlice";
 import "./index.scss"
-import {testAuth} from "./util/auth/Auth";
+import {testAuth} from "./util/api/Auth_Endpoint";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

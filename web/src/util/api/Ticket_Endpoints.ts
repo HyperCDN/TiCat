@@ -1,18 +1,17 @@
-import {Ticket, TicketCreate, TicketUpdate} from "../../static/entities/Ticket";
 import reduxStore from "../redux/ReduxStore";
-import {Paged} from "../../static/entities/Paged";
-import {removeTicketFromCache, updateCachedTicket} from "../redux/slice/BoardCache";
-import {Board} from "../../static/entities/Board";
+import {removeTicketFromCache, updateCachedTicket} from "../redux/slice/DataCache";
+import {Ticket, TicketCreate, TicketUpdate} from "./entities/Ticket";
+import {Paged} from "./entities/Paged";
 
 
-export async function getAllTicketsFor(boardId: string, chunk: number = 25, cacheResult: boolean = true) {
+export async function getAllTicketsFor(boardId: string, chunk: number = 100, cacheResult: boolean = true) {
     console.log(`getting all available tickets in board %s`, boardId.toUpperCase())
     let tickets: Ticket[] = []
     let page = 0
     while (true) {
         const paged = await getTicketsFor(boardId.toUpperCase(), page++, chunk, cacheResult)
         paged.entities.forEach(ticket => tickets.push(ticket))
-        if (paged.entities.length < chunk) break;
+        if (paged.entities.length < paged.chunkSize) break;
     }
     return tickets
 }
@@ -26,15 +25,11 @@ export async function getTicketsFor(boardId: string, page: number, chunk: number
         } : undefined
     })
     .then(r => {
-        if (!r.ok) {
-            throw Error(`fetching tickets from api failed with status ${r.status}`)
-        }
+        if (!r.ok) throw Error(`fetching tickets from api failed with status ${r.status}`)
         return r.json() as unknown as Paged<Ticket>
     })
     .then(paged => {
-        if (cacheResult) {
-            paged.entities.forEach(ticket => reduxStore.dispatch(updateCachedTicket(ticket)))
-        }
+        if (cacheResult) paged.entities.forEach(ticket => reduxStore.dispatch(updateCachedTicket(ticket)))
         return paged
     })
 }
@@ -42,7 +37,7 @@ export async function getTicketsFor(boardId: string, page: number, chunk: number
 export async function getTicketFor(boardId: string, ticketId: number, useCache: boolean = false, cacheResult: boolean = true) {
     console.log(`getting data for ticket with id %s from board %s`, ticketId, boardId.toUpperCase())
     if (useCache) {
-        const ticketCache = reduxStore.getState().boardCache.tickets.get(boardId.toUpperCase())
+        const ticketCache = reduxStore.getState().data.tickets.get(boardId.toUpperCase())
         let ticket = ticketCache?.get(ticketId)
         if(ticket) {
             console.log(`found cached entity for ticket with id %s from board %s`, ticketId, boardId.toUpperCase())
@@ -56,15 +51,11 @@ export async function getTicketFor(boardId: string, ticketId: number, useCache: 
         } : undefined
     })
     .then(r => {
-        if (!r.ok) {
-            throw Error(`fetching ticket from api failed with status ${r.status}`)
-        }
+        if (!r.ok) throw Error(`fetching ticket from api failed with status ${r.status}`)
         return r.json() as Ticket
     })
     .then(ticket => {
-        if (cacheResult) {
-            reduxStore.dispatch(updateCachedTicket(ticket))
-        }
+        if (cacheResult) reduxStore.dispatch(updateCachedTicket(ticket))
         return ticket
     })
 }
@@ -80,15 +71,11 @@ export async function createNewTicket(boardId: string, template: TicketCreate, c
         body: JSON.stringify(template)
     })
     .then(r => {
-        if(!r.ok) {
-            throw Error(`creating new ticket failed with status ${r.status}`)
-        }
+        if(!r.ok) throw Error(`creating new ticket failed with status ${r.status}`)
         return r.json() as Ticket
     })
     .then(ticket => {
-        if (cacheResult) {
-            reduxStore.dispatch(updateCachedTicket(ticket))
-        }
+        if (cacheResult) reduxStore.dispatch(updateCachedTicket(ticket))
         return ticket
     })
 }
@@ -104,9 +91,7 @@ export async function updateTicket(boardId: string, template: TicketUpdate, cach
         body: JSON.stringify(template)
     })
     .then(r => {
-        if(!r.ok) {
-            throw Error(`updating ticket failed with status ${r.status}`)
-        }
+        if(!r.ok) throw Error(`updating ticket failed with status ${r.status}`)
         return r.json() as Ticket
     })
     .then(ticket => {

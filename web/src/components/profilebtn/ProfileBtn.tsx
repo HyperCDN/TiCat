@@ -5,8 +5,9 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {Button, IconButton, Menu, MenuItem, Typography} from "@mui/material";
 import {Link} from "react-router-dom";
 import "./ProfileBtn.scss"
-import {initializeLogin, logout} from "../../util/auth/Auth";
 import jwtDecode, {JwtPayload} from "jwt-decode";
+import {initializeLogin, logout} from "../../util/api/Auth_Endpoint";
+import {getSelfUserUUID} from "../../util/api/Self";
 
 type StateProps = {
     accessToken?: string
@@ -43,15 +44,23 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
         anchorEl: null
     }
 
+    private openMenu(event: React.MouseEvent<HTMLButtonElement>) {
+        this.setState({anchorEl: event.currentTarget})
+    }
+
+    private closeMenu() {
+        this.setState({anchorEl: null})
+    }
+
     render() {
 
         if (this.props.accessToken){
-            const selfUserId = jwtDecode<JwtPayload>(this.props.accessToken)["sub"];
+            const selfUserId = getSelfUserUUID()
             return (
                 <div id="login-btn">
                     <IconButton
                         color="inherit"
-                        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {this.setState({anchorEl: event.currentTarget})}}
+                        onClick={(event: React.MouseEvent<HTMLButtonElement>) => this.openMenu(event)}
                     >
                         <AccountCircleIcon/>
                     </IconButton>
@@ -60,13 +69,13 @@ class ProfileBtn extends Component<ComponentProps, ComponentLocalState> {
                         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                         transformOrigin={{ vertical: "top", horizontal: "center" }}
                         open={Boolean(this.state.anchorEl)}
-                        onClose={() => {this.setState({anchorEl: null})}}
+                        onClose={() => this.closeMenu()}
                     >
-                        <MenuItem onClick={() => {this.setState({anchorEl: null})}} component={Link} to={'/profile/' + selfUserId}>
+                        <MenuItem onClick={() => this.closeMenu()} component={Link} to={`/profile/${selfUserId}`}>
                             <Typography>Profile</Typography>
                         </MenuItem>
                         <MenuItem onClick={() => {
-                            this.setState({anchorEl: null})
+                            this.closeMenu()
                             logout()
                         }} >
                             <Typography>Logout</Typography>

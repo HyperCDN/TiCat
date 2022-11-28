@@ -3,9 +3,8 @@ import {Component} from "react";
 import {connect} from "react-redux";
 import Hero from "../../components/hero/Hero";
 import "./HomeView.scss"
-import {Board} from "../../static/entities/Board";
-import {boardCache} from "../../util/redux/slice/BoardCache";
 import {getAllAvailableBoards} from "../../util/api/Board_Endpoints";
+import {Board} from "../../util/api/entities/Board";
 
 type StateProps = {
 
