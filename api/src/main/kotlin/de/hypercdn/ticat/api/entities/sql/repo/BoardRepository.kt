@@ -15,19 +15,19 @@ interface BoardRepository : JpaRepository<Board, String> {
 
     @Query(
         """
-        SELECT board FROM Board board
+        FROM Board board
         LEFT JOIN Member member ON (board.id = member.boardId)
         WHERE (:#{#user.isAdmin()} = true)
             OR (board.ownerUUID = :#{#user.uuid})
             OR (member.userUUID = :#{#user.uuid} AND member.status = 'GRANTED' AND member.canView = true)
-            OR (board.visibility = 'LOGGED_IN_USER' AND :#{#authenticated} = true)
+            OR (board.visibility = 'LOGGED_IN_USER' AND :#{#authenticatedUser} = true)
             OR (board.visibility = 'ANYONE')
     """
     )
     fun getBoardsAvailableTo(
         @Param("user") user: User,
-        page: Pageable = PageRequest.of(0, 25),
-       // @Param("authenticated") authenticated: Boolean = User.isAuthenticated()
+        page: Pageable = PageRequest.of(0, 50),
+       @Param("authenticatedUser") authenticatedUser: Boolean = false
     ): List<Board>
 
 

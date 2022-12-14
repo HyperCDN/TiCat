@@ -14,15 +14,14 @@ import org.springframework.stereotype.Repository
 interface MemberRepository : JpaRepository<Member, MemberId>{
 
     @Query("""
-        SELECT members
-        FROM Member members
-        WHERE members.boardId = :#{#board.id}
-            AND (members.status = 'GRANTED' OR :#{#onlyGranted} = false)
+        FROM Member member
+        WHERE member.boardId = :#{#board.id}
+            AND (member.status = 'GRANTED' OR :#{#anyStatus} = true)
     """)
     fun getMembersOf(
         @Param("board") board: Board,
-        page: Pageable = PageRequest.of(0, 50),
-        @Param("onlyGranted") onlyGranted: Boolean = true
+        page: Pageable = PageRequest.of(0, 100),
+        @Param("anyStatus") anyStatus: Boolean = false
     ): List<Member>
 
 }

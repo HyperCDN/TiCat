@@ -27,16 +27,16 @@ class User {
         nullable = false,
         updatable = false
     )
-    @Generated(GenerationTime.INSERT)
     @ColumnDefault("NOW()")
+    @CreationTimestamp
     lateinit var createdAt: OffsetDateTime
 
     @Column(
         name = "updated_at",
         nullable = false
     )
-    @Generated(GenerationTime.ALWAYS)
     @ColumnDefault("NOW()")
+    @UpdateTimestamp
     lateinit var updatedAt: OffsetDateTime
 
     @Column(

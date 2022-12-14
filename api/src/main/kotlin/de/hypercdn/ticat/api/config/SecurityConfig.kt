@@ -27,7 +27,7 @@ class SecurityConfig {
                 // auth required
                 it.requestMatchers( HttpMethod.GET,"/jwt" ).authenticated()
                 it.requestMatchers( HttpMethod.POST,"/jwt", "/b", "/i/*", "/i/*/*" ).authenticated()
-                it.requestMatchers( HttpMethod.PATCH,"/b/*", "/m/*/*" ).authenticated()
+                it.requestMatchers( HttpMethod.PATCH,"/b/*", "/m/*/*", "/u/*" ).authenticated()
                 it.requestMatchers( HttpMethod.DELETE,"/b/*", "/m/*/*" ).authenticated()
             }
             .oauth2ResourceServer {

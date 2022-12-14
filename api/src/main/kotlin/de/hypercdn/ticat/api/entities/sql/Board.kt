@@ -3,7 +3,6 @@ package de.hypercdn.ticat.api.entities.sql
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -26,17 +25,17 @@ class Board {
         nullable = false,
         updatable = false
     )
-    @Generated(GenerationTime.INSERT)
     @ColumnDefault("NOW()")
+    @CreationTimestamp
     lateinit var createdAt: OffsetDateTime
 
     @Column(
         name = "updated_at",
         nullable = false
     )
-    @Generated(GenerationTime.ALWAYS)
     @ColumnDefault("NOW()")
-    lateinit var updatedAt: OffsetDateTime
+    @UpdateTimestamp
+    var updatedAt: OffsetDateTime = OffsetDateTime.now()
 
     @Column(
         name = "title",
@@ -79,10 +78,6 @@ class Board {
     @ColumnDefault("MANUAL_ADD")
     @Enumerated(EnumType.STRING)
     var accessMode: AccessMode = AccessMode.MANUAL_ADD
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    var members: List<Member> = emptyList()
 
     enum class AccessMode {
         PUBLIC_JOIN,
