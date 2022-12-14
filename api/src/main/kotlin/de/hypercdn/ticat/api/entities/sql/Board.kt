@@ -4,13 +4,14 @@ import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
 @Table(name = "boards")
 @DynamicInsert
 @DynamicUpdate
-class Board() {
+class Board {
 
     @Id
     @Column(
@@ -27,7 +28,15 @@ class Board() {
     )
     @Generated(GenerationTime.INSERT)
     @ColumnDefault("NOW()")
-    lateinit var createdAt: LocalDateTime
+    lateinit var createdAt: OffsetDateTime
+
+    @Column(
+        name = "updated_at",
+        nullable = false
+    )
+    @Generated(GenerationTime.ALWAYS)
+    @ColumnDefault("NOW()")
+    lateinit var updatedAt: OffsetDateTime
 
     @Column(
         name = "title",

@@ -44,9 +44,9 @@ class TicketInfo @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!board.isVisibleTo(selfUser, selfMember)){
+        if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
         val pageRequest = PageRequest.of(page, chunkSize)
         val tickets = ticketRepository.getTicketsOf(board, pageRequest)
         val pagedData = PagedData<TicketJson>(pageRequest)
@@ -78,9 +78,9 @@ class TicketInfo @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!board.isVisibleTo(selfUser, selfMember)){
+        if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
         val ticket = ticketRepository.getTicketIfExists(TicketId(ticketId, board.id))
         return TicketJson(ticket)
             .includeId()

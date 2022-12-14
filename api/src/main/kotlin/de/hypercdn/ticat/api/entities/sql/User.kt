@@ -5,14 +5,14 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.*
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
 @Table(name = "users")
 @DynamicInsert
 @DynamicUpdate
-class User() {
+class User {
 
     @Id
     @Column(
@@ -29,7 +29,15 @@ class User() {
     )
     @Generated(GenerationTime.INSERT)
     @ColumnDefault("NOW()")
-    lateinit var createdAt: LocalDateTime
+    lateinit var createdAt: OffsetDateTime
+
+    @Column(
+        name = "updated_at",
+        nullable = false
+    )
+    @Generated(GenerationTime.ALWAYS)
+    @ColumnDefault("NOW()")
+    lateinit var updatedAt: OffsetDateTime
 
     @Column(
         name = "first_name",

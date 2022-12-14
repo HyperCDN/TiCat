@@ -2,6 +2,8 @@ package de.hypercdn.ticat.api.entities.json.`in`
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class MemberUpdateJson {
 
@@ -32,5 +34,9 @@ class MemberUpdateJson {
         var canAdministrate: Boolean? = null
 
     }
+
+    @JsonProperty(value = "versionTimestamp", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var versionBaseTimestamp: OffsetDateTime? = null
 
 }

@@ -61,9 +61,8 @@ class BoardInfo @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!board.isVisibleTo(selfUser, selfMember)){
+        if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         return BoardJson(board)
             .includeId()
             .includeTitle()

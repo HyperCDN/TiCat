@@ -4,7 +4,7 @@ import de.hypercdn.ticat.api.entities.sql.joinkeys.TicketId
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
@@ -12,7 +12,7 @@ import java.util.*
 @Table(name = "tickets")
 @DynamicInsert
 @DynamicUpdate
-class Ticket() {
+class Ticket {
 
     @Id
     @Column(
@@ -44,7 +44,15 @@ class Ticket() {
     )
     @Generated(GenerationTime.INSERT)
     @ColumnDefault("NOW()")
-    lateinit var createdAt: LocalDateTime
+    lateinit var createdAt: OffsetDateTime
+
+    @Column(
+        name = "updated_at",
+        nullable = false
+    )
+    @Generated(GenerationTime.ALWAYS)
+    @ColumnDefault("NOW()")
+    lateinit var updatedAt: OffsetDateTime
 
     @Column(
         name = "created_by",

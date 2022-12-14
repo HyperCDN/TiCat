@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.hypercdn.ticat.api.entities.sql.Board
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.function.Supplier
 
 class BoardJson(
@@ -43,6 +45,10 @@ class BoardJson(
 
     }
 
+    @JsonProperty(value = "versionTimestamp", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var versionTimestamp: OffsetDateTime? = null
+
     fun includeId(skip: Boolean = false): BoardJson {
         if (skip) return this
         id = board?.id
@@ -78,6 +84,12 @@ class BoardJson(
         val tmp = Settings()
         tmp.visibility = board?.visibility
         tmp.accessMode = board?.accessMode
+        return this
+    }
+
+    fun includeVersionTimestamp(skip: Boolean = false): BoardJson {
+        if (skip) return this
+        versionTimestamp = board?.updatedAt
         return this
     }
 

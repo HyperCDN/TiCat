@@ -5,6 +5,7 @@ START TRANSACTION;
     (
         user_uuid        UUID        NOT NULL,
         created_at       TIMESTAMP   NOT NULL DEFAULT NOW(),
+        updated_at       TIMESTAMP   NOT NULL DEFAULT NOW(),
         first_name       VARCHAR(64)          DEFAULT NULL,
         last_name        VARCHAR(64)          DEFAULT NULL,
         display_name     VARCHAR(64) NOT NULL,
@@ -33,13 +34,14 @@ START TRANSACTION;
     -- Representing a workspace;
     CREATE TABLE boards
     (
-        board_id    VARCHAR(16)       NOT NULL CHECK ( upper(board_id) = board_id ),
-        created_at  TIMESTAMP         NOT NULL DEFAULT now(),
-        title       VARCHAR(64)       NOT NULL,
-        description TEXT,
-        ownership   UUID              NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
-        visibility  BOARD_VISIBILITY  NOT NULL DEFAULT 'MEMBERS_ONLY',
-        access_mode BOARD_ACCESS_MODE NOT NULL DEFAULT 'MANUAL_ADD',
+        board_id         VARCHAR(16)       NOT NULL CHECK ( UPPER(board_id) = board_id ),
+        created_at       TIMESTAMP         NOT NULL DEFAULT NOW(),
+        updated_at       TIMESTAMP         NOT NULL DEFAULT NOW(),
+        title            VARCHAR(64)       NOT NULL,
+        description      TEXT,
+        ownership        UUID              NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
+        visibility       BOARD_VISIBILITY  NOT NULL DEFAULT 'MEMBERS_ONLY',
+        access_mode      BOARD_ACCESS_MODE NOT NULL DEFAULT 'MANUAL_ADD',
 
         PRIMARY KEY (board_id),
         CONSTRAINT fk_owner
@@ -57,6 +59,7 @@ START TRANSACTION;
         user_uuid        UUID                    NOT NULL,
         board_id         VARCHAR(16)             NOT NULL,
         created_at       TIMESTAMP                        DEFAULT NOW(),
+        updated_at       TIMESTAMP               NOT NULL DEFAULT NOW(),
         status           BOARD_MEMBERSHIP_STATUS NOT NULL DEFAULT 'BLOCKED',
         can_view         BOOLEAN                          DEFAULT false,
         can_use          BOOLEAN                          DEFAULT false,
@@ -74,7 +77,82 @@ START TRANSACTION;
                 ON DELETE CASCADE
     );
 
+    -- Update guest member on visibility change
+    CREATE FUNCTION UPDATE_GUEST_MEMBER_ON_VISIBILITY_CHANGE_FNT()
+        RETURNS TRIGGER
+        LANGUAGE plpgsql
+    AS
+    $$
+    BEGIN
+        IF NEW.visibility = 'ANYONE' THEN
+            INSERT into board_members (user_uuid, board_id, status, can_view)
+            VALUES ('00000000-0000-4000-0000-000000000002', NEW.board_id, 'GRANTED', true)
+            ON CONFLICT (user_uuid, board_id) DO UPDATE SET status = 'GRANTED', can_view = true;
+        ELSE
+            INSERT into board_members (user_uuid, board_id, status, can_view)
+            VALUES ('00000000-0000-4000-0000-000000000002', NEW.board_id, 'BLOCKED', false)
+            ON CONFLICT (user_uuid, board_id) DO UPDATE SET status = 'BLOCKED', can_view = false;
+        END IF;
+        RETURN NULL;
+    END;
+    $$;
 
+    CREATE TRIGGER update_guest_member_on_visibility_change
+        AFTER UPDATE OF visibility
+        ON boards
+        FOR EACH ROW
+    EXECUTE PROCEDURE UPDATE_GUEST_MEMBER_ON_VISIBILITY_CHANGE_FNT();
+
+    -- Add default members when a new board has been inserted
+    CREATE FUNCTION ADD_DEFAULT_BOARD_MEMBERS_FNT()
+        RETURNS TRIGGER
+        LANGUAGE plpgsql
+    AS
+    $$
+    BEGIN
+        -- add owner as member
+        INSERT into board_members (user_uuid, board_id, status, can_view, can_use, can_manage, can_administrate)
+        VALUES (NEW.ownership, NEW.board_id, 'GRANTED', true, true, true, true);
+        -- add guest as member
+        IF NEW.visibility = 'ANYONE' THEN
+            INSERT into board_members (user_uuid, board_id, status, can_view, can_use, can_manage, can_administrate)
+            VALUES ('00000000-0000-4000-0000-000000000002', NEW.board_id, 'GRANTED', true, false, false, false);
+        ELSE
+            INSERT into board_members (user_uuid, board_id, status, can_view, can_use, can_manage, can_administrate)
+            VALUES ('00000000-0000-4000-0000-000000000002', NEW.board_id, 'BLOCKED', false, false, false, false);
+        END IF;
+        RETURN NULL;
+    END;
+    $$;
+
+    CREATE TRIGGER add_default_board_members
+        AFTER INSERT
+        ON boards
+        FOR EACH ROW
+    EXECUTE PROCEDURE ADD_DEFAULT_BOARD_MEMBERS_FNT();
+
+    -- Apply default permissions on member status changes
+    CREATE FUNCTION APPLY_STATUS_PERMISSION_OVERRIDES_FNT()
+        RETURNS TRIGGER
+        LANGUAGE plpgsql
+    AS
+    $$
+    BEGIN
+        IF NEW.status != 'GRANTED' THEN -- deny all permissions if access has not been granted
+            NEW.can_use = false;
+            NEW.can_view = false;
+            NEW.can_manage = false;
+            NEW.can_administrate = false;
+        END IF;
+        RETURN (NEW);
+    END;
+    $$;
+
+    CREATE TRIGGER apply_status_permission_override
+        BEFORE INSERT OR UPDATE OF status
+        ON board_members
+        FOR EACH ROW
+    EXECUTE PROCEDURE APPLY_STATUS_PERMISSION_OVERRIDES_FNT();
 
     -- Assigns a general category to a ticket
     CREATE TYPE TICKET_CATEGORY AS ENUM ('EPIC', 'BUG', 'STORY');
@@ -89,6 +167,7 @@ START TRANSACTION;
         ticket_id  INT                      DEFAULT -1,
         board_id   VARCHAR(16)     NOT NULL,
         created_at TIMESTAMP                DEFAULT NOW(),
+        updated_at TIMESTAMP       NOT NULL DEFAULT NOW(),
         created_by UUID            NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
         category   TICKET_CATEGORY NOT NULL,
         priority   TICKET_PRIORITY NOT NULL DEFAULT 'NORMAL',

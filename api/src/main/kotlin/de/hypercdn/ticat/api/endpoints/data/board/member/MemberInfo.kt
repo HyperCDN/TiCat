@@ -42,9 +42,9 @@ class MemberInfo @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if(!board.isVisibleTo(selfUser, selfMember)){
+        if(!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
         val pageRequest = PageRequest.of(page, chunkSize)
         val members = memberRepository.getMembersOf(board, pageRequest, !selfMember.hasEffectiveManagementPower())
         val pagedData = PagedData<MemberJson>(pageRequest)
@@ -75,9 +75,9 @@ class MemberInfo @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if(!board.isVisibleTo(selfUser, selfMember)){
+        if(!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
         val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return MemberJson(member)

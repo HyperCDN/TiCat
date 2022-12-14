@@ -18,9 +18,8 @@ fun UserRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID: UUID? = User.G
     } else {
         if (fallbackUUID != null) findById(User.GUEST_UUID) else Optional.empty()
     }.orElse(null)
-    if (user == null || !user.canLogin) {
+    if (user == null || !user.canLogin)
         throw ResponseStatusException(HttpStatus.FORBIDDEN)
-    }
     return user
 }
 

@@ -30,9 +30,9 @@ class BoardManagement @Autowired constructor(
         @RequestBody requestBody: BoardCreateJson
     ): BoardJson {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        if (!selfUser.canBoardCreate) {
+        if (!selfUser.canBoardCreate)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
         val newBoard = Board()
         newBoard.id = requestBody.id!!
         newBoard.title = requestBody.title!!
@@ -41,9 +41,9 @@ class BoardManagement @Autowired constructor(
             it.visibility?.let { v -> newBoard.visibility = v }
             it.accessMode?.let { v -> newBoard.accessMode = v }
         }
-        if(boardRepository.existsById(newBoard.id)) {
+        if(boardRepository.existsById(newBoard.id))
             throw ResponseStatusException(HttpStatus.CONFLICT)
-        }
+
         val newBoardSaved = boardRepository.save(newBoard)
         return BoardJson(newBoardSaved)
             .includeId()
@@ -64,15 +64,18 @@ class BoardManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if(!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true ) {
+        if(!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true )
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
+        requestBody.versionBaseTimestamp?.let { if (board.updatedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+
         requestBody.title?.let { board.title = it }
         requestBody.description?.let { board.description = it }
         requestBody.settings?.let {
             it.visibility?.let { v -> board.visibility = v }
             it.accessMode?.let { v -> board.accessMode = v }
         }
+
         val updatedBoardSaved = boardRepository.save(board)
         return BoardJson(updatedBoardSaved)
             .includeId()
@@ -92,9 +95,8 @@ class BoardManagement @Autowired constructor(
     ) {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
-        if (!selfUser.isAdmin && board.ownerUUID != selfUser.uuid ) {
+        if (!selfUser.isAdmin && board.ownerUUID != selfUser.uuid )
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         boardRepository.delete(board)
     }
 

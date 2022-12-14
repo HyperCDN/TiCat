@@ -65,6 +65,7 @@ class MemberManagement @Autowired constructor(
         }
         val invitedUser = userRepository.findById(userUUID).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
         var invitedMember = memberRepository.findById(MemberId(invitedUser.uuid, board.id)).orElse(null)
         if (invitedMember == null) {
             invitedMember = Member()
@@ -77,6 +78,7 @@ class MemberManagement @Autowired constructor(
             invitedMember.canView = true
             invitedMember = memberRepository.save(invitedMember)
         }
+
         return MemberJson(invitedMember)
             .includeUser {
                 UserJson(invitedUser)
@@ -96,11 +98,13 @@ class MemberManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true) {
+        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+        requestBody.versionBaseTimestamp?.let { if (member.updatedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+
         requestBody.block?.let { if (selfMember.hasEffectiveAdministrationPower() && it) member.status = Member.MembershipStatus.BLOCKED }
         requestBody.permissions?.let {
             it.canView?.let { v -> member.canView = v }
@@ -108,6 +112,7 @@ class MemberManagement @Autowired constructor(
             it.canManage?.let { v -> member.canManage = v }
             it.canAdministrate?.let { v -> if (selfMember.hasEffectiveAdministrationPower()) member.canAdministrate = v}
         }
+
         val updatedMember = memberRepository.save(member)
         return MemberJson(updatedMember)
             .includeUser {
@@ -127,9 +132,8 @@ class MemberManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && (selfMember?.hasEffectiveManagementPower() != true) || selfUser.uuid != userUUID) {
+        if (!selfUser.isAdmin && (selfMember?.hasEffectiveManagementPower() != true) || selfUser.uuid != userUUID)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         if (member.status != Member.MembershipStatus.BLOCKED){

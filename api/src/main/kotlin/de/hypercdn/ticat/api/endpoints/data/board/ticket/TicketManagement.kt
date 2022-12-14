@@ -36,9 +36,9 @@ class TicketManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true) {
+        if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+
         val newTicket = Ticket()
         newTicket.boardId = board.id
         newTicket.creatorUUID = selfUser.uuid
@@ -50,6 +50,7 @@ class TicketManagement @Autowired constructor(
             it.priority?.let { v -> newTicket.priority = v }
             it.status?.let { v -> newTicket.status = v }
         }
+
         val savedTicket = ticketRepository.save(newTicket)
         return TicketJson(savedTicket)
             .includeId()
@@ -76,11 +77,13 @@ class TicketManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true) {
+        if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         val ticket = ticketRepository.findById(TicketId(ticketId, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+        requestBody.versionBaseTimestamp?.let { if (ticket.updatedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+
         requestBody.title?.let { ticket.title = it }
         requestBody.content?.let { ticket.content = it }
         requestBody.assigneeUUID?.let { ticket.assigneeUUID = it }
@@ -89,6 +92,7 @@ class TicketManagement @Autowired constructor(
             it.priority?.let { v -> ticket.priority = v }
             it.status?.let { v -> ticket.status = v }
         }
+
         val updatedTicket = ticketRepository.save(ticket)
         return TicketJson(updatedTicket)
             .includeId()
@@ -116,18 +120,18 @@ class TicketManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true) {
+        if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         val ticket = ticketRepository.findById(TicketId(ticketId, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        if(actualDelete && selfMember.hasEffectiveManagementPower()) {
+
+        return if(actualDelete && selfMember.hasEffectiveManagementPower()) {
             ticketRepository.delete(ticket)
-            return null
+            null
         } else {
             ticket.status = Ticket.Status.CLOSED
             val savedTicket = ticketRepository.save(ticket)
-            return TicketJson(savedTicket)
+            TicketJson(savedTicket)
                 .includeId()
                 .includeTitle()
                 .includeContent()
