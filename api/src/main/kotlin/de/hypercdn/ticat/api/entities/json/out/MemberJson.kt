@@ -3,7 +3,7 @@ package de.hypercdn.ticat.api.entities.json.out
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.hypercdn.ticat.api.entities.sql.Member
+import de.hypercdn.ticat.api.entities.sql.entities.Member
 import java.time.OffsetDateTime
 import java.util.function.Supplier
 

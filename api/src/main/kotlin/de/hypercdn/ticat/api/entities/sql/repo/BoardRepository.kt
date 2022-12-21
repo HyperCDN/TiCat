@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.entities.sql.repo
 
-import de.hypercdn.ticat.api.entities.sql.Board
-import de.hypercdn.ticat.api.entities.sql.User
+import de.hypercdn.ticat.api.entities.sql.entities.Board
+import de.hypercdn.ticat.api.entities.sql.entities.User
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository

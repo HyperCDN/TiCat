@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.endpoints.auth
 
 import de.hypercdn.ticat.api.entities.json.out.UserJson
-import de.hypercdn.ticat.api.entities.sql.User
+import de.hypercdn.ticat.api.entities.sql.entities.User
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value

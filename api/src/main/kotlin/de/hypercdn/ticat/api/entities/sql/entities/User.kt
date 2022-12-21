@@ -1,4 +1,4 @@
-package de.hypercdn.ticat.api.entities.sql
+package de.hypercdn.ticat.api.entities.sql.entities
 
 import jakarta.persistence.*
 import jakarta.persistence.Table
@@ -102,7 +102,7 @@ class User {
     var canBoardJoin: Boolean = true
 
     override fun toString(): String {
-        return "$uuid is ($firstName, $lastName) as $displayName"
+        return "User $displayName ($uuid)"
     }
 
     companion object {

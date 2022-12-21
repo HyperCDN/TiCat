@@ -1,4 +1,4 @@
-package de.hypercdn.ticat.api.entities.sql
+package de.hypercdn.ticat.api.entities.sql.entities
 
 import jakarta.persistence.*
 import jakarta.persistence.Table
@@ -145,6 +145,10 @@ class Ticket {
         OPEN,
         CLOSED,
         DELETED
+    }
+
+    override fun toString(): String {
+        return "Ticket $id ($boardId)"
     }
 
 }

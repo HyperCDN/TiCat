@@ -7,8 +7,8 @@ import de.hypercdn.ticat.api.entities.json.`in`.BoardCreateJson
 import de.hypercdn.ticat.api.entities.json.`in`.BoardUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
-import de.hypercdn.ticat.api.entities.sql.Board
-import de.hypercdn.ticat.api.entities.sql.Member
+import de.hypercdn.ticat.api.entities.sql.entities.Board
+import de.hypercdn.ticat.api.entities.sql.entities.Member
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository

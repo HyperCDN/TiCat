@@ -3,7 +3,7 @@ package de.hypercdn.ticat.api.endpoints.data.users
 import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackWhenAllowed
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.json.out.helper.PagedData
-import de.hypercdn.ticat.api.entities.sql.User
+import de.hypercdn.ticat.api.entities.sql.entities.User
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import jakarta.validation.constraints.Size
 import org.springframework.beans.factory.annotation.Autowired

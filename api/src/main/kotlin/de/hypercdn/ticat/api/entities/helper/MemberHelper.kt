@@ -1,6 +1,6 @@
 package de.hypercdn.ticat.api.entities.helper
 
-import de.hypercdn.ticat.api.entities.sql.Member
+import de.hypercdn.ticat.api.entities.sql.entities.Member
 
 fun Member.hasEffectiveViewPower(): Boolean {
     return user.isAdmin

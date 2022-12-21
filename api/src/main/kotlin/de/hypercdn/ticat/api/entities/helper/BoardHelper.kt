@@ -1,8 +1,8 @@
 package de.hypercdn.ticat.api.entities.helper
 
-import de.hypercdn.ticat.api.entities.sql.Board
-import de.hypercdn.ticat.api.entities.sql.Member
-import de.hypercdn.ticat.api.entities.sql.User
+import de.hypercdn.ticat.api.entities.sql.entities.Board
+import de.hypercdn.ticat.api.entities.sql.entities.Member
+import de.hypercdn.ticat.api.entities.sql.entities.User
 
 fun Board.isVisibleTo(user: User, member: Member? = null): Boolean {
     if (user.isAdmin) return true

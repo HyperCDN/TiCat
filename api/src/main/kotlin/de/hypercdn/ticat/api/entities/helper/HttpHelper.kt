@@ -1,8 +1,8 @@
 package de.hypercdn.ticat.api.entities.helper
 
-import de.hypercdn.ticat.api.entities.sql.Board
-import de.hypercdn.ticat.api.entities.sql.Ticket
-import de.hypercdn.ticat.api.entities.sql.User
+import de.hypercdn.ticat.api.entities.sql.entities.Board
+import de.hypercdn.ticat.api.entities.sql.entities.Ticket
+import de.hypercdn.ticat.api.entities.sql.entities.User
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository

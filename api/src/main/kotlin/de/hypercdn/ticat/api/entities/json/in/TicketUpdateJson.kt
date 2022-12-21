@@ -2,7 +2,7 @@ package de.hypercdn.ticat.api.entities.json.`in`
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.hypercdn.ticat.api.entities.sql.Ticket
+import de.hypercdn.ticat.api.entities.sql.entities.Ticket
 import java.time.OffsetDateTime
 import java.util.*
 

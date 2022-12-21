@@ -1,4 +1,4 @@
-package de.hypercdn.ticat.api.entities.sql
+package de.hypercdn.ticat.api.entities.sql.entities
 
 import jakarta.persistence.*
 import jakarta.persistence.Table
@@ -91,6 +91,10 @@ class Board {
         ANYONE,
         LOGGED_IN_USER,
         MEMBERS_ONLY
+    }
+
+    override fun toString(): String {
+        return "Board $id"
     }
 
 }

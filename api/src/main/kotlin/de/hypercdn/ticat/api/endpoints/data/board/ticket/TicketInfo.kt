@@ -8,8 +8,8 @@ import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.TicketJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.json.out.helper.PagedData
-import de.hypercdn.ticat.api.entities.sql.Member
-import de.hypercdn.ticat.api.entities.sql.Ticket
+import de.hypercdn.ticat.api.entities.sql.entities.Member
+import de.hypercdn.ticat.api.entities.sql.entities.Ticket
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
