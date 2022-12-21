@@ -1,18 +1,25 @@
 package de.hypercdn.ticat.api.entities.sql
 
-import de.hypercdn.ticat.api.entities.sql.joinkeys.TicketId
 import jakarta.persistence.*
 import jakarta.persistence.Table
+import lombok.NoArgsConstructor
 import org.hibernate.annotations.*
+import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
-@IdClass(TicketId::class)
+@IdClass(Ticket.Key::class)
 @Table(name = "tickets")
 @DynamicInsert
 @DynamicUpdate
 class Ticket {
+
+    @NoArgsConstructor
+    class Key(
+        var id: Int,
+        var boardId: String
+    ) : Serializable
 
     @Id
     @Column(

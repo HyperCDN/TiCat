@@ -6,7 +6,6 @@ import de.hypercdn.ticat.api.entities.json.out.MemberJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.Board
 import de.hypercdn.ticat.api.entities.sql.Member
-import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
@@ -29,7 +28,7 @@ class MemberManagement @Autowired constructor(
     ) {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMembership = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMembership = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (selfMembership != null) {
             if (selfMembership.status != Member.MembershipStatus.OFFERED) return
             selfMembership.status = Member.MembershipStatus.GRANTED
@@ -59,14 +58,14 @@ class MemberManagement @Autowired constructor(
     ): MemberJson {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true ) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
         val invitedUser = userRepository.findById(userUUID).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-        var invitedMember = memberRepository.findById(MemberId(invitedUser.uuid, board.id)).orElse(null)
+        var invitedMember = memberRepository.findById(Member.Key(invitedUser.uuid, board.id)).orElse(null)
         if (invitedMember == null) {
             invitedMember = Member()
             invitedMember.boardId = board.id
@@ -97,13 +96,13 @@ class MemberManagement @Autowired constructor(
     ): MemberJson {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
+        val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-        requestBody.versionBaseTimestamp?.let { if (member.updatedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+        requestBody.versionBaseTimestamp?.let { if (member.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
 
         requestBody.block?.let { if (selfMember.hasEffectiveAdministrationPower() && it) member.status = Member.MembershipStatus.BLOCKED }
         requestBody.permissions?.let {
@@ -131,10 +130,10 @@ class MemberManagement @Autowired constructor(
     ) {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && (selfMember?.hasEffectiveManagementPower() != true) || selfUser.uuid != userUUID)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
+        val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         if (member.status != Member.MembershipStatus.BLOCKED){
             memberRepository.delete(member)

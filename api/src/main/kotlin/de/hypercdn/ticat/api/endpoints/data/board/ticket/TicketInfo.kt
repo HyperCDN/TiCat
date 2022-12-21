@@ -8,8 +8,8 @@ import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.TicketJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.json.out.helper.PagedData
-import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
-import de.hypercdn.ticat.api.entities.sql.joinkeys.TicketId
+import de.hypercdn.ticat.api.entities.sql.Member
+import de.hypercdn.ticat.api.entities.sql.Ticket
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
@@ -43,7 +43,7 @@ class TicketInfo @Autowired constructor(
     ): PagedData<TicketJson> {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
 
@@ -77,11 +77,11 @@ class TicketInfo @Autowired constructor(
     ): TicketJson {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
 
-        val ticket = ticketRepository.getTicketIfExists(TicketId(ticketId, board.id))
+        val ticket = ticketRepository.getTicketIfExists(Ticket.Key(ticketId, board.id))
         return TicketJson(ticket)
             .includeId()
             .includeTitle()

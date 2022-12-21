@@ -8,7 +8,7 @@ import de.hypercdn.ticat.api.entities.json.`in`.BoardUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.Board
-import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
+import de.hypercdn.ticat.api.entities.sql.Member
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
@@ -63,7 +63,7 @@ class BoardManagement @Autowired constructor(
     ): BoardJson {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if(!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true )
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
 

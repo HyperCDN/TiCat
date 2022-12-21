@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.hypercdn.ticat.api.entities.sql.Member
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.function.Supplier
 
@@ -96,7 +95,7 @@ class MemberJson(
 
     fun includeVersionTimestamp(skip: Boolean = false): MemberJson {
         if (skip) return this
-        versionTimestamp = member?.updatedAt
+        versionTimestamp = member?.modifiedAt
         return this
     }
 

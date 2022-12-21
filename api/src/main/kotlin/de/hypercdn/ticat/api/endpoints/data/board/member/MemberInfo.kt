@@ -8,7 +8,7 @@ import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.MemberJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.json.out.helper.PagedData
-import de.hypercdn.ticat.api.entities.sql.joinkeys.MemberId
+import de.hypercdn.ticat.api.entities.sql.Member
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
@@ -41,7 +41,7 @@ class MemberInfo @Autowired constructor(
     ): PagedData<MemberJson> {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if(!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
 
@@ -74,11 +74,11 @@ class MemberInfo @Autowired constructor(
     ): MemberJson{
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
         val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(MemberId(selfUser.uuid, board.id)).orElse(null)
+        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if(!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
 
-        val member = memberRepository.findById(MemberId(userUUID, board.id)).orElse(null)
+        val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return MemberJson(member)
             .includeUser {

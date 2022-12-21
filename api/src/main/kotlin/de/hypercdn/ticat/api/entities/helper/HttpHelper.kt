@@ -3,7 +3,6 @@ package de.hypercdn.ticat.api.entities.helper
 import de.hypercdn.ticat.api.entities.sql.Board
 import de.hypercdn.ticat.api.entities.sql.Ticket
 import de.hypercdn.ticat.api.entities.sql.User
-import de.hypercdn.ticat.api.entities.sql.joinkeys.TicketId
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
@@ -30,7 +29,7 @@ fun BoardRepository.getBoardIfExists(boardId: String): Board {
 }
 
 @Throws(ResponseStatusException::class)
-fun TicketRepository.getTicketIfExists(ticketId: TicketId): Ticket {
+fun TicketRepository.getTicketIfExists(ticketId: Ticket.Key): Ticket {
     return findById(ticketId).orElse(null)
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 }
