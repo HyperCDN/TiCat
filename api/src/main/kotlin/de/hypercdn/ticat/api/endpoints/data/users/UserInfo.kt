@@ -22,7 +22,7 @@ class UserInfo @Autowired constructor(
     val userRepository: UserRepository
 ){
 
-    @GetMapping("/u")
+    @GetMapping("/users")
     @Validated
     fun getUserInfos(
         @RequestParam("user_uuids", required = true) @Size(min = 1, max = 100) userUUIDs: List<UUID>
@@ -41,7 +41,7 @@ class UserInfo @Autowired constructor(
         return paged
     }
 
-    @GetMapping("/u/{userUUID}")
+    @GetMapping("/user/{userUUID}")
     fun getUserInfo(
         @PathVariable("userUUID") userUUID: UUID
     ): UserJson {

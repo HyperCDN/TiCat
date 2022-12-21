@@ -28,7 +28,7 @@ class TicketManagement @Autowired constructor(
     val ticketRepository: TicketRepository
 ) {
 
-    @PostMapping("/t/{boardId}")
+    @PostMapping("/ticket/{boardId}")
     fun createNewTicket(
         @RequestBody requestBody: TicketCreateJson,
         @PathVariable("boardId") boardId: String
@@ -68,7 +68,7 @@ class TicketManagement @Autowired constructor(
             .includeProperties()
     }
 
-    @PatchMapping("/t/{boardId}/{ticketId}")
+    @PatchMapping("/ticket/{boardId}/{ticketId}")
     fun updateTicket(
         @RequestBody requestBody: TicketUpdateJson,
         @PathVariable("boardId") boardId: String,
@@ -111,7 +111,7 @@ class TicketManagement @Autowired constructor(
             .includeProperties()
     }
 
-    @DeleteMapping("/t/{boardId}/{ticketId}")
+    @DeleteMapping("/ticket/{boardId}/{ticketId}")
     fun deleteTicket(
         @PathVariable("boardId") boardId: String,
         @PathVariable("ticketId") ticketId: Int,

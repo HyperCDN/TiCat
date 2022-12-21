@@ -34,7 +34,7 @@ class TicketInfo @Autowired constructor(
     val ticketRepository: TicketRepository
 ) {
 
-    @GetMapping("/t/{boardId}")
+    @GetMapping("/tickets/{boardId}")
     @Validated
     fun getTickets(
         @PathVariable("boardId") boardId: String,
@@ -70,7 +70,7 @@ class TicketInfo @Autowired constructor(
         return pagedData
     }
 
-    @GetMapping("/t/{boardId}/{ticketId}")
+    @GetMapping("/ticket/{boardId}/{ticketId}")
     fun getTicketInfo(
         @PathVariable("boardId") boardId: String,
         @PathVariable("ticketId") ticketId: Int

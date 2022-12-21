@@ -28,7 +28,7 @@ class BoardInfo @Autowired constructor(
     val memberRepository: MemberRepository
 ) {
 
-    @GetMapping("/b")
+    @GetMapping("/boards")
     @Validated
     fun getAvailableBoards(
         @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
@@ -54,7 +54,7 @@ class BoardInfo @Autowired constructor(
         return paged
     }
 
-    @GetMapping("/b/{boardId}")
+    @GetMapping("/board/{boardId}")
     fun getBoardInfo(
         @PathVariable("boardId") boardId: String
     ): BoardJson {

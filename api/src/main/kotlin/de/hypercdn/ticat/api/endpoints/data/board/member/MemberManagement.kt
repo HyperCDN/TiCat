@@ -23,7 +23,7 @@ class MemberManagement @Autowired constructor(
     val memberRepository: MemberRepository
 ) {
 
-    @PostMapping("/i/{boardId}")
+    @PostMapping("/invite/{boardId}")
     fun requestAccessOrAcceptInvite(
         @PathVariable("boardId") boardId: String,
     ) {
@@ -52,7 +52,7 @@ class MemberManagement @Autowired constructor(
         memberRepository.save(membershipRequest)
     }
 
-    @PostMapping("/i/{boardId}/{userUUID}")
+    @PostMapping("/invite/{boardId}/{userUUID}")
     fun inviteMemberOrAcceptRequest(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID,
@@ -89,7 +89,7 @@ class MemberManagement @Autowired constructor(
             .includePermissions()
     }
 
-    @PatchMapping("/m/{boardId}/{userUUID}")
+    @PatchMapping("/member/{boardId}/{userUUID}")
     fun updateMembership(
         @RequestBody requestBody: MemberUpdateJson,
         @PathVariable("boardId") boardId: String,
@@ -124,7 +124,7 @@ class MemberManagement @Autowired constructor(
             .includePermissions()
     }
 
-    @DeleteMapping("/m/{boardId}/{userUUID}")
+    @DeleteMapping("/member/{boardId}/{userUUID}")
     fun deleteOrDenyMembership(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID,

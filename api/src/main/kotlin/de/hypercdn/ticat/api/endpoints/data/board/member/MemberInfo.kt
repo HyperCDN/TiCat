@@ -32,7 +32,7 @@ class MemberInfo @Autowired constructor(
     val memberRepository: MemberRepository
 ) {
 
-    @GetMapping("/m/{boardId}")
+    @GetMapping("/members/{boardId}")
     @Validated
     fun getMembers(
         @PathVariable("boardId") boardId: String,
@@ -67,7 +67,7 @@ class MemberInfo @Autowired constructor(
         return pagedData
     }
 
-    @GetMapping("/m/{boardId}/{userUUID}")
+    @GetMapping("/member/{boardId}/{userUUID}")
     fun getMemberInfo(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID

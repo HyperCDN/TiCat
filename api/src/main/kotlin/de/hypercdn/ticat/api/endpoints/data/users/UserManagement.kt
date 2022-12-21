@@ -6,7 +6,6 @@ import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,7 +18,7 @@ class UserManagement @Autowired constructor(
     val userRepository: UserRepository
 ) {
 
-    @PatchMapping("/u/{userUUID}")
+    @PatchMapping("/user/{userUUID}")
     fun updateUserPermissions(
         @PathVariable("userUUID") userUUID: UUID,
         @RequestBody requestBody: UserUpdateJson

@@ -25,7 +25,7 @@ class BoardManagement @Autowired constructor(
     val memberRepository: MemberRepository
 ) {
 
-    @PostMapping("/b")
+    @PostMapping("/board")
     fun createNewBoard(
         @RequestBody requestBody: BoardCreateJson
     ): BoardJson {
@@ -56,7 +56,7 @@ class BoardManagement @Autowired constructor(
             .includeSettings()
     }
 
-    @PatchMapping("/b/{boardId}")
+    @PatchMapping("/board/{boardId}")
     fun updateBoard(
         @RequestBody requestBody: BoardUpdateJson,
         @PathVariable("boardId") boardId: String
@@ -89,7 +89,7 @@ class BoardManagement @Autowired constructor(
             .includeSettings()
     }
 
-    @DeleteMapping("/b/{boardId}")
+    @DeleteMapping("/board/{boardId}")
     fun deleteBoard(
         @PathVariable("boardId") boardId: String
     ) {
