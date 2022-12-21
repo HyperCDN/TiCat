@@ -27,7 +27,7 @@ interface BoardRepository : JpaRepository<Board, String> {
     fun getBoardsAvailableTo(
         @Param("user") user: User,
         page: Pageable = PageRequest.of(0, 50),
-       @Param("authenticatedUser") authenticatedUser: Boolean = false
+        @Param("authenticatedUser") authenticatedUser: Boolean = false
     ): List<Board>
 
 

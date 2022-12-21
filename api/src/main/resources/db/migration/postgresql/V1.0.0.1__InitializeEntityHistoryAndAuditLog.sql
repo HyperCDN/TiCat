@@ -48,18 +48,18 @@ EXECUTE PROCEDURE BOARD_HISTORY_ID_INCREMENT_FNT();
 -- Representing changes made to a ticket which may be restored later
 CREATE TABLE ticket_history
 (
-    board_id    VARCHAR(16) NOT NULL,
-    ticket_id   INT         NOT NULL,
-    version_id  INT         NOT NULL DEFAULT -1,
+    board_id   VARCHAR(16) NOT NULL,
+    ticket_id  INT         NOT NULL,
+    version_id INT         NOT NULL DEFAULT -1,
     changed_at TIMESTAMP   NOT NULL DEFAULT NOW(),
-    editor      UUID        NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
+    editor     UUID        NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
 
-    category    TICKET_CATEGORY      DEFAULT NULL,
-    priority    TICKET_PRIORITY      DEFAULT NULL,
-    status      TICKET_STATUS        DEFAULT NULL,
-    title       VARCHAR(100)         DEFAULT NULL,
-    content     TEXT                 DEFAULT NULL,
-    assignee    UUID                 DEFAULT '00000000-0000-4000-0000-000000000001',
+    category   TICKET_CATEGORY      DEFAULT NULL,
+    priority   TICKET_PRIORITY      DEFAULT NULL,
+    status     TICKET_STATUS        DEFAULT NULL,
+    title      VARCHAR(100)         DEFAULT NULL,
+    content    TEXT                 DEFAULT NULL,
+    assignee   UUID                 DEFAULT '00000000-0000-4000-0000-000000000001',
 
     PRIMARY KEY (board_id, ticket_id, version_id),
     CONSTRAINT fk_ticket
@@ -127,15 +127,15 @@ CREATE TYPE AUDIT_ACTION AS ENUM (
     'BOARD_CREATE', 'BOARD_MODIFY', 'BOARD_DELETE', 'BOARD_HISTORY_RESTORE',
     'TICKET_CREATE', 'TICKET_MODIFY', 'TICKET_EDIT', 'TICKET_HISTORY_RESTORE',
     'MEMBERSHIP_INVITE_CREATE', 'MEMBERSHIP_INVITE_ACCEPT', 'MEMBERSHIP_MODIFY', 'MEMBERSHIP_DELETE'
-);
+    );
 
 CREATE TABLE audit_log
 (
-    audit_id BIGSERIAL NOT NULL,
-    actor UUID NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
-    action_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    action AUDIT_ACTION NOT NULL,
-    entity_hint TEXT NOT NULL,
+    audit_id    BIGSERIAL    NOT NULL,
+    actor       UUID         NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
+    action_time TIMESTAMP    NOT NULL DEFAULT NOW(),
+    action      AUDIT_ACTION NOT NULL,
+    entity_hint TEXT         NOT NULL,
 
     PRIMARY KEY (audit_id),
     CONSTRAINT fk_actor

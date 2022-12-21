@@ -115,7 +115,7 @@ class TicketManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String,
         @PathVariable("ticketId") ticketId: Int,
         @RequestParam("actualDelete", required = false, defaultValue = "false") actualDelete: Boolean
-    ):TicketJson? {
+    ): TicketJson? {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
@@ -124,7 +124,7 @@ class TicketManagement @Autowired constructor(
         val ticket = ticketRepository.findById(Ticket.Key(ticketId, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-        return if(actualDelete && selfMember.hasEffectiveManagementPower()) {
+        return if (actualDelete && selfMember.hasEffectiveManagementPower()) {
             ticketRepository.delete(ticket)
             null
         } else {

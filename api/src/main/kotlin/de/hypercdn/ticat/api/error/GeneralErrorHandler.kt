@@ -18,12 +18,12 @@ class GeneralErrorHandler {
     }
 
     @ExceptionHandler
-    fun handleResponseStatusException(exception: ResponseStatusException){
+    fun handleResponseStatusException(exception: ResponseStatusException) {
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun handleInternalError(exception: Error){
+    fun handleInternalError(exception: Error) {
     }
 
 }

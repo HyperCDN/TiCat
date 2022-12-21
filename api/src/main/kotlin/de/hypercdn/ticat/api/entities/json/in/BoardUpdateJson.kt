@@ -3,7 +3,6 @@ package de.hypercdn.ticat.api.entities.json.`in`
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.hypercdn.ticat.api.entities.sql.Board
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 class BoardUpdateJson {

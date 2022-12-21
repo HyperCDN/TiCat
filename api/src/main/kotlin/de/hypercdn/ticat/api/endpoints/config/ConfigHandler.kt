@@ -19,9 +19,11 @@ class ConfigHandler @Autowired constructor(
     @GetMapping("/config")
     fun getFrontendConfigData(): JsonNode {
         return mapper.createObjectNode()
-            .set("auth", mapper.createObjectNode()
-                .put("resourceServerURL", resourceServerURL)
-                .put("clientId", resourceServerClientId) )
+            .set(
+                "auth", mapper.createObjectNode()
+                    .put("resourceServerURL", resourceServerURL)
+                    .put("clientId", resourceServerClientId)
+            )
     }
 
 }

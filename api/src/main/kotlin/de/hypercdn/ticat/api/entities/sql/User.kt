@@ -105,7 +105,7 @@ class User {
         return "$uuid is ($firstName, $lastName) as $displayName"
     }
 
-    companion object{
+    companion object {
 
         fun isAuthenticated(): Boolean {
             val context = SecurityContextHolder.getContext()
@@ -116,11 +116,10 @@ class User {
         fun jwtAuthenticationToken(): JwtAuthenticationToken {
             val context = SecurityContextHolder.getContext()
             val authentication = context.authentication
-            if (authentication is JwtAuthenticationToken){
-                return authentication
-            }
-            throw IllegalAccessError("No authentication available or type mismatch")
+            if (authentication !is JwtAuthenticationToken) throw IllegalAccessError("No authentication available or type mismatch")
+            return authentication
         }
+
         fun currentAuthUUID(): UUID {
             return UUID.fromString(jwtAuthenticationToken().tokenAttributes["sub"] as String)
         }

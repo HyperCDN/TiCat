@@ -68,7 +68,7 @@ class BoardJson(
 
     fun includeOwner(skip: Boolean = false, userSupplier: Supplier<UserJson>? = null): BoardJson {
         if (skip) return this
-        if (userSupplier == null){
+        if (userSupplier == null) {
             val tmp = UserJson()
             tmp.id = board?.ownerUUID
             owner = tmp

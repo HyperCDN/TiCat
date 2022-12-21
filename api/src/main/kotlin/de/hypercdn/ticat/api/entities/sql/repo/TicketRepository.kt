@@ -12,10 +12,12 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TicketRepository : JpaRepository<Ticket, Ticket.Key> {
 
-    @Query("""
+    @Query(
+        """
         FROM Ticket ticket
         WHERE ticket.boardId = :#{#board.id}
-    """)
+    """
+    )
     fun getTicketsOf(
         @Param("board") board: Board,
         page: Pageable = PageRequest.of(0, 100),

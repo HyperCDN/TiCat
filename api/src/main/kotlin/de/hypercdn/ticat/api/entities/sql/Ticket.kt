@@ -40,8 +40,10 @@ class Ticket {
 
     @PrimaryKeyJoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", referencedColumnName = "board_id",
-        insertable = false, updatable = false)
+    @JoinColumn(
+        name = "board_id", referencedColumnName = "board_id",
+        insertable = false, updatable = false
+    )
     lateinit var board: Board
 
     @Column(
@@ -69,8 +71,10 @@ class Ticket {
     lateinit var creatorUUID: UUID
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false)
+    @JoinColumn(
+        name = "created_by", referencedColumnName = "user_uuid",
+        insertable = false, updatable = false
+    )
     lateinit var creator: User
 
     @Column(
@@ -117,8 +121,10 @@ class Ticket {
     var assigneeUUID: UUID? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignee", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false)
+    @JoinColumn(
+        name = "assignee", referencedColumnName = "user_uuid",
+        insertable = false, updatable = false
+    )
     var assignee: User? = null
 
     enum class Category {

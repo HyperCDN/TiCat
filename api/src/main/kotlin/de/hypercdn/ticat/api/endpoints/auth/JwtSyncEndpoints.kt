@@ -24,7 +24,7 @@ class JwtSyncEndpoints @Autowired constructor(
 
     @GetMapping("/jwt")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun authTest(){
+    fun authTest() {
         // endpoint to be used to verify that an auth token is valid
     }
 
@@ -38,16 +38,18 @@ class JwtSyncEndpoints @Autowired constructor(
             (authentication.tokenAttributes["family_name"] as? String)?.let { user.lastName = it }
             (authentication.tokenAttributes["preferred_username"] as? String)?.let { user.displayName = it }
             (authentication.tokenAttributes["email"] as? String)?.let { user.email = it }
-            (authentication.tokenAttributes["realm_access"] as? Map<*, *> )?.let {
-                (it["roles"] as? List<*>)?.let { v -> {
-                    user.canLogin = v.contains(userRole)
-                    user.isAdmin = v.contains(adminRole)
-                }}
+            (authentication.tokenAttributes["realm_access"] as? Map<*, *>)?.let {
+                (it["roles"] as? List<*>)?.let { v ->
+                    {
+                        user.canLogin = v.contains(userRole)
+                        user.isAdmin = v.contains(adminRole)
+                    }
+                }
             }
             val savedUser = userRepository.save(user)
             return UserJson(savedUser)
                 .includeAll()
-        }catch (e: IllegalAccessException) {
+        } catch (e: IllegalAccessException) {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal auth failure")
         }
     }

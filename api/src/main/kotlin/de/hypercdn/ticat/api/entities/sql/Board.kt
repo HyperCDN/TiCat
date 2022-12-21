@@ -59,8 +59,10 @@ class Board {
     lateinit var ownerUUID: UUID
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ownership", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false)
+    @JoinColumn(
+        name = "ownership", referencedColumnName = "user_uuid",
+        insertable = false, updatable = false
+    )
     lateinit var owner: User
 
     @Column(

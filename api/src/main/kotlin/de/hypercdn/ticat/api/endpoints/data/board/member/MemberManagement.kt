@@ -59,7 +59,7 @@ class MemberManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true ) {
+        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
         val invitedUser = userRepository.findById(userUUID).orElse(null)
@@ -72,7 +72,7 @@ class MemberManagement @Autowired constructor(
             invitedMember.userUUID = invitedUser.uuid
             invitedMember.status = Member.MembershipStatus.OFFERED
             invitedMember = memberRepository.save(invitedMember)
-        } else if (invitedMember.status == Member.MembershipStatus.REQUESTED){
+        } else if (invitedMember.status == Member.MembershipStatus.REQUESTED) {
             invitedMember.status = Member.MembershipStatus.GRANTED
             invitedMember.canView = true
             invitedMember = memberRepository.save(invitedMember)
@@ -109,7 +109,7 @@ class MemberManagement @Autowired constructor(
             it.canView?.let { v -> member.canView = v }
             it.canUse?.let { v -> member.canUse = v }
             it.canManage?.let { v -> member.canManage = v }
-            it.canAdministrate?.let { v -> if (selfMember.hasEffectiveAdministrationPower()) member.canAdministrate = v}
+            it.canAdministrate?.let { v -> if (selfMember.hasEffectiveAdministrationPower()) member.canAdministrate = v }
         }
 
         val updatedMember = memberRepository.save(member)
@@ -135,7 +135,7 @@ class MemberManagement @Autowired constructor(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        if (member.status != Member.MembershipStatus.BLOCKED){
+        if (member.status != Member.MembershipStatus.BLOCKED) {
             memberRepository.delete(member)
         }
     }

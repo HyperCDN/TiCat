@@ -10,13 +10,15 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MemberRepository : JpaRepository<Member, Member.Key>{
+interface MemberRepository : JpaRepository<Member, Member.Key> {
 
-    @Query("""
+    @Query(
+        """
         FROM Member member
         WHERE member.boardId = :#{#board.id}
             AND (member.status = 'GRANTED' OR :#{#anyStatus} = true)
-    """)
+    """
+    )
     fun getMembersOf(
         @Param("board") board: Board,
         page: Pageable = PageRequest.of(0, 100),

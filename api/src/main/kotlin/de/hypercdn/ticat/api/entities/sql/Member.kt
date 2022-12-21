@@ -31,8 +31,10 @@ class Member {
 
     @PrimaryKeyJoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_uuid", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false)
+    @JoinColumn(
+        name = "user_uuid", referencedColumnName = "user_uuid",
+        insertable = false, updatable = false
+    )
     lateinit var user: User
 
     @Id
@@ -45,8 +47,10 @@ class Member {
 
     @PrimaryKeyJoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", referencedColumnName = "board_id",
-        insertable = false, updatable = false)
+    @JoinColumn(
+        name = "board_id", referencedColumnName = "board_id",
+        insertable = false, updatable = false
+    )
     lateinit var board: Board
 
     @Column(

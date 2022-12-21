@@ -20,7 +20,7 @@ import java.util.*
 @RestController
 class UserInfo @Autowired constructor(
     val userRepository: UserRepository
-){
+) {
 
     @GetMapping("/users")
     @Validated

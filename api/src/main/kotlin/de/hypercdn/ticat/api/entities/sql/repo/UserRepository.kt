@@ -9,5 +9,4 @@ import java.util.*
 interface UserRepository : JpaRepository<User, UUID> {
 
 
-
 }
