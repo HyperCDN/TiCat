@@ -27,7 +27,7 @@ class UserManagement @Autowired constructor(
         if(!selfUser.isAdmin) throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val user = userRepository.findById(userUUID).orElse(null)
 
-        requestBody.versionBaseTimestamp?.let { if (user.updatedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+        requestBody.versionBaseTimestamp?.let { if (user.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
 
         requestBody.permissions?.let {
             it.canLogin?.let { v -> user.canLogin = v }

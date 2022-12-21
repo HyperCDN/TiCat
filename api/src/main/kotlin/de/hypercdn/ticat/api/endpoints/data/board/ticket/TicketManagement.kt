@@ -82,7 +82,7 @@ class TicketManagement @Autowired constructor(
         val ticket = ticketRepository.findById(TicketId(ticketId, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-        requestBody.versionBaseTimestamp?.let { if (ticket.updatedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+        requestBody.versionBaseTimestamp?.let { if (ticket.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
 
         requestBody.title?.let { ticket.title = it }
         requestBody.content?.let { ticket.content = it }

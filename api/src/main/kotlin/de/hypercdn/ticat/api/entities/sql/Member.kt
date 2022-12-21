@@ -52,12 +52,12 @@ class Member {
     lateinit var createdAt: OffsetDateTime
 
     @Column(
-        name = "updated_at",
+        name = "modified_at",
         nullable = false
     )
     @ColumnDefault("NOW()")
     @UpdateTimestamp
-    lateinit var updatedAt: OffsetDateTime
+    lateinit var modifiedAt: OffsetDateTime
 
     @Column(
         name = "status",

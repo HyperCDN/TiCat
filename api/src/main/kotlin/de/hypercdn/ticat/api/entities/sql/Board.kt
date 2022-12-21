@@ -30,12 +30,12 @@ class Board {
     lateinit var createdAt: OffsetDateTime
 
     @Column(
-        name = "updated_at",
+        name = "modified_at",
         nullable = false
     )
     @ColumnDefault("NOW()")
     @UpdateTimestamp
-    var updatedAt: OffsetDateTime = OffsetDateTime.now()
+    var modifiedAt: OffsetDateTime = OffsetDateTime.now()
 
     @Column(
         name = "title",
