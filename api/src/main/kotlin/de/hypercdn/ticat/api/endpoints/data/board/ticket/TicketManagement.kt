@@ -8,12 +8,10 @@ import de.hypercdn.ticat.api.entities.json.`in`.TicketCreateJson
 import de.hypercdn.ticat.api.entities.json.`in`.TicketUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.TicketJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
+import de.hypercdn.ticat.api.entities.sql.entities.Audit
 import de.hypercdn.ticat.api.entities.sql.entities.Member
 import de.hypercdn.ticat.api.entities.sql.entities.Ticket
-import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
-import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
-import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
-import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
+import de.hypercdn.ticat.api.entities.sql.repo.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -24,7 +22,8 @@ class TicketManagement @Autowired constructor(
     val userRepository: UserRepository,
     val boardRepository: BoardRepository,
     val memberRepository: MemberRepository,
-    val ticketRepository: TicketRepository
+    val ticketRepository: TicketRepository,
+    val auditLogRepository: AuditLogRepository
 ) {
 
     @PostMapping("/ticket/{boardId}")
@@ -51,6 +50,7 @@ class TicketManagement @Autowired constructor(
         }
 
         val savedTicket = ticketRepository.save(newTicket)
+        auditLogRepository.save(Audit.forEntity(savedTicket, selfUser, Audit.Action.TICKET_CREATE))
         return TicketJson(savedTicket)
             .includeId()
             .includeTitle()
@@ -93,6 +93,7 @@ class TicketManagement @Autowired constructor(
         }
 
         val updatedTicket = ticketRepository.save(ticket)
+        auditLogRepository.save(Audit.forEntity(updatedTicket, selfUser, Audit.Action.TICKET_MODIFY))
         return TicketJson(updatedTicket)
             .includeId()
             .includeTitle()
@@ -126,10 +127,12 @@ class TicketManagement @Autowired constructor(
 
         return if (actualDelete && selfMember.hasEffectiveManagementPower()) {
             ticketRepository.delete(ticket)
+            auditLogRepository.save(Audit.forEntity(ticket, selfUser, Audit.Action.TICKET_DELETE))
             null
         } else {
             ticket.status = Ticket.Status.CLOSED
             val savedTicket = ticketRepository.save(ticket)
+            auditLogRepository.save(Audit.forEntity(savedTicket, selfUser, Audit.Action.TICKET_MODIFY))
             TicketJson(savedTicket)
                 .includeId()
                 .includeTitle()

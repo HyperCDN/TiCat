@@ -34,7 +34,7 @@ CREATE TYPE BOARD_ACCESS_MODE AS ENUM ('PUBLIC_JOIN', 'MANUAL_VERIFY', 'MANUAL_A
 -- Representing a workspace
 CREATE TABLE boards
 (
-    board_id    VARCHAR(16)       NOT NULL CHECK ( UPPER(board_id) = board_id ),
+    board_id    VARCHAR(16)       NOT NULL CHECK ( UPPER(board_id) = board_id AND board_id NOT LIKE '%[^A-Z0-9]%'),
     created_at  TIMESTAMP         NOT NULL DEFAULT NOW(),
     modified_at TIMESTAMP         NOT NULL DEFAULT NOW(),
     title       VARCHAR(64)       NOT NULL,

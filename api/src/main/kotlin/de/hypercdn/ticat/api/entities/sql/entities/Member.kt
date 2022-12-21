@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
+import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import lombok.NoArgsConstructor
@@ -13,7 +14,7 @@ import java.util.*
 @Table(name = "board_members")
 @DynamicInsert
 @DynamicUpdate
-class Member {
+class Member : EntityHint {
 
     @NoArgsConstructor
     class Key(
@@ -111,6 +112,10 @@ class Member {
         OFFERED,
         GRANTED,
         BLOCKED
+    }
+
+    override fun asHint(): String {
+        TODO("Not yet implemented")
     }
 
     override fun toString(): String {

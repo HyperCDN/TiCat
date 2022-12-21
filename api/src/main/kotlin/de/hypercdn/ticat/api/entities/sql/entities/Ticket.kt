@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
+import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import lombok.NoArgsConstructor
@@ -13,7 +14,7 @@ import java.util.*
 @Table(name = "tickets")
 @DynamicInsert
 @DynamicUpdate
-class Ticket {
+class Ticket : EntityHint {
 
     @NoArgsConstructor
     class Key(
@@ -145,6 +146,10 @@ class Ticket {
         OPEN,
         CLOSED,
         DELETED
+    }
+
+    override fun asHint(): String {
+        return "ticket#$boardId:$id"
     }
 
     override fun toString(): String {

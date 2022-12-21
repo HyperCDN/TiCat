@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
+import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
@@ -10,7 +11,7 @@ import java.util.*
 @Table(name = "boards")
 @DynamicInsert
 @DynamicUpdate
-class Board {
+class Board : EntityHint {
 
     @Id
     @Column(
@@ -91,6 +92,10 @@ class Board {
         ANYONE,
         LOGGED_IN_USER,
         MEMBERS_ONLY
+    }
+
+    override fun asHint(): String {
+        return "board#$id"
     }
 
     override fun toString(): String {

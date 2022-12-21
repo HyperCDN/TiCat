@@ -4,8 +4,10 @@ import de.hypercdn.ticat.api.entities.helper.*
 import de.hypercdn.ticat.api.entities.json.`in`.MemberUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.MemberJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
+import de.hypercdn.ticat.api.entities.sql.entities.Audit
 import de.hypercdn.ticat.api.entities.sql.entities.Board
 import de.hypercdn.ticat.api.entities.sql.entities.Member
+import de.hypercdn.ticat.api.entities.sql.repo.AuditLogRepository
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
@@ -19,7 +21,8 @@ import java.util.*
 class MemberManagement @Autowired constructor(
     val userRepository: UserRepository,
     val boardRepository: BoardRepository,
-    val memberRepository: MemberRepository
+    val memberRepository: MemberRepository,
+    val auditLogRepository: AuditLogRepository
 ) {
 
     @PostMapping("/invite/{boardId}")
@@ -48,11 +51,12 @@ class MemberManagement @Autowired constructor(
             else -> throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
         membershipRequest.canView = true
-        memberRepository.save(membershipRequest)
+        val savedMembershipRequest = memberRepository.save(membershipRequest)
+        auditLogRepository.save(Audit.forEntity(savedMembershipRequest, selfUser, Audit.Action.INVITE_ACCEPT))
     }
 
     @PostMapping("/invite/{boardId}/{userUUID}")
-    fun inviteMemberOrAcceptRequest(
+    fun inviteMemberOrGrantMembership(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID,
     ): MemberJson {
@@ -72,10 +76,12 @@ class MemberManagement @Autowired constructor(
             invitedMember.userUUID = invitedUser.uuid
             invitedMember.status = Member.MembershipStatus.OFFERED
             invitedMember = memberRepository.save(invitedMember)
+            auditLogRepository.save(Audit.forEntity(invitedMember, selfUser, Audit.Action.INVITE_CREATE))
         } else if (invitedMember.status == Member.MembershipStatus.REQUESTED) {
             invitedMember.status = Member.MembershipStatus.GRANTED
             invitedMember.canView = true
             invitedMember = memberRepository.save(invitedMember)
+            auditLogRepository.save(Audit.forEntity(invitedMember, selfUser, Audit.Action.MEMBERSHIP_GRANT))
         }
 
         return MemberJson(invitedMember)
@@ -113,6 +119,7 @@ class MemberManagement @Autowired constructor(
         }
 
         val updatedMember = memberRepository.save(member)
+        auditLogRepository.save(Audit.forEntity(updatedMember, selfUser, Audit.Action.MEMBERSHIP_MODIFY))
         return MemberJson(updatedMember)
             .includeUser {
                 UserJson(updatedMember.user)
@@ -137,6 +144,7 @@ class MemberManagement @Autowired constructor(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         if (member.status != Member.MembershipStatus.BLOCKED) {
             memberRepository.delete(member)
+            auditLogRepository.save(Audit.forEntity(member, selfUser, Audit.Action.MEMBERSHIP_DELETE))
         }
     }
 

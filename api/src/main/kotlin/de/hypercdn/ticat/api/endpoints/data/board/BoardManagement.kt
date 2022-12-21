@@ -7,8 +7,10 @@ import de.hypercdn.ticat.api.entities.json.`in`.BoardCreateJson
 import de.hypercdn.ticat.api.entities.json.`in`.BoardUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
+import de.hypercdn.ticat.api.entities.sql.entities.Audit
 import de.hypercdn.ticat.api.entities.sql.entities.Board
 import de.hypercdn.ticat.api.entities.sql.entities.Member
+import de.hypercdn.ticat.api.entities.sql.repo.AuditLogRepository
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
@@ -22,7 +24,8 @@ import java.util.*
 class BoardManagement @Autowired constructor(
     val userRepository: UserRepository,
     val boardRepository: BoardRepository,
-    val memberRepository: MemberRepository
+    val memberRepository: MemberRepository,
+    val auditLogRepository: AuditLogRepository
 ) {
 
     @PostMapping("/board")
@@ -45,6 +48,7 @@ class BoardManagement @Autowired constructor(
             throw ResponseStatusException(HttpStatus.CONFLICT)
 
         val newBoardSaved = boardRepository.save(newBoard)
+        auditLogRepository.save(Audit.forEntity(newBoardSaved, selfUser, Audit.Action.BOARD_CREATE))
         return BoardJson(newBoardSaved)
             .includeId()
             .includeTitle()
@@ -77,6 +81,7 @@ class BoardManagement @Autowired constructor(
         }
 
         val updatedBoardSaved = boardRepository.save(board)
+        auditLogRepository.save(Audit.forEntity(updatedBoardSaved, selfUser, Audit.Action.BOARD_MODIFY))
         return BoardJson(updatedBoardSaved)
             .includeId()
             .includeTitle()
@@ -98,6 +103,7 @@ class BoardManagement @Autowired constructor(
         if (!selfUser.isAdmin && board.ownerUUID != selfUser.uuid)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         boardRepository.delete(board)
+        auditLogRepository.save(Audit.forEntity(board, selfUser, Audit.Action.BOARD_DELETE))
     }
 
 }

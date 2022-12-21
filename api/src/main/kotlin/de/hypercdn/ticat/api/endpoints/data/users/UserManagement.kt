@@ -3,6 +3,8 @@ package de.hypercdn.ticat.api.endpoints.data.users
 import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackWhenAllowed
 import de.hypercdn.ticat.api.entities.json.`in`.UserUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
+import de.hypercdn.ticat.api.entities.sql.entities.Audit
+import de.hypercdn.ticat.api.entities.sql.repo.AuditLogRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -15,7 +17,8 @@ import java.util.*
 
 @RestController
 class UserManagement @Autowired constructor(
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    val auditLogRepository: AuditLogRepository
 ) {
 
     @PatchMapping("/user/{userUUID}")
@@ -36,6 +39,9 @@ class UserManagement @Autowired constructor(
         }
 
         val updatedUserSaved = userRepository.save(user)
+
+        auditLogRepository.save(Audit.forEntity(user, selfUser, Audit.Action.USER_MODIFY))
+
         return UserJson(updatedUserSaved)
             .includeAll()
     }
