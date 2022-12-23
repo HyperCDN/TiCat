@@ -1,6 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
-import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
@@ -11,7 +10,7 @@ import java.util.*
 @Table(name = "boards")
 @DynamicInsert
 @DynamicUpdate
-class Board : EntityHint {
+class Board {
 
     @Id
     @Column(
@@ -46,25 +45,25 @@ class Board : EntityHint {
     lateinit var title: String
 
     @Column(
-        name = "description",
-        nullable = true
+        name = "description"
     )
     @ColumnDefault("NULL")
     var description: String? = null
 
     @Column(
         name = "ownership",
-        nullable = false,
         updatable = false
     )
-    lateinit var ownerUUID: UUID
+    var ownerUUID: UUID? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "ownership", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false
+        name = "ownership",
+        referencedColumnName = "user_uuid",
+        insertable = false,
+        updatable = false
     )
-    lateinit var owner: User
+    var owner: User? = null
 
     @Column(
         name = "visibility",
@@ -92,10 +91,6 @@ class Board : EntityHint {
         ANYONE,
         LOGGED_IN_USER,
         MEMBERS_ONLY
-    }
-
-    override fun asHint(): String {
-        return "board#$id"
     }
 
     override fun toString(): String {

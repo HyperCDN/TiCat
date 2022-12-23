@@ -1,6 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
-import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import org.hibernate.annotations.*
@@ -13,7 +12,7 @@ import java.util.*
 @Table(name = "users")
 @DynamicInsert
 @DynamicUpdate
-class User : EntityHint {
+class User {
 
     @Id
     @Column(
@@ -41,15 +40,13 @@ class User : EntityHint {
     lateinit var modifiedAt: OffsetDateTime
 
     @Column(
-        name = "first_name",
-        nullable = true
+        name = "first_name"
     )
     @ColumnDefault("NULL")
     var firstName: String? = null
 
     @Column(
-        name = "last_name",
-        nullable = true
+        name = "last_name"
     )
     @ColumnDefault("NULL")
     var lastName: String? = null
@@ -61,8 +58,7 @@ class User : EntityHint {
     lateinit var displayName: String
 
     @Column(
-        name = "email",
-        nullable = true
+        name = "email"
     )
     @ColumnDefault("NULL")
     var email: String? = null
@@ -101,9 +97,6 @@ class User : EntityHint {
     )
     @ColumnDefault("true")
     var canBoardJoin: Boolean = true
-    override fun asHint(): String {
-        return "user#$uuid"
-    }
 
     override fun toString(): String {
         return "User $displayName ($uuid)"
@@ -129,7 +122,6 @@ class User : EntityHint {
         }
 
         val SYSTEM_UUID: UUID = UUID.fromString("00000000-0000-4000-0000-000000000000")
-        val DELETED_USER_UUID: UUID = UUID.fromString("00000000-0000-4000-0000-000000000001")
         val GUEST_UUID: UUID = UUID.fromString("00000000-0000-4000-0000-000000000002")
 
     }

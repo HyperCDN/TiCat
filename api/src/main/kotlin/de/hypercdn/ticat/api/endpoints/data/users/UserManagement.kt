@@ -40,7 +40,7 @@ class UserManagement @Autowired constructor(
 
         val updatedUserSaved = userRepository.save(user)
 
-        auditLogRepository.save(Audit.forEntity(user, selfUser, Audit.Action.USER_MODIFY))
+        auditLogRepository.save(Audit.of(user, selfUser, Audit.Action.USER_MODIFY))
 
         return UserJson(updatedUserSaved)
             .includeAll()

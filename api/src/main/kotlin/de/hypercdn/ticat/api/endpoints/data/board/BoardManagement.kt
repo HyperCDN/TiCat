@@ -48,7 +48,7 @@ class BoardManagement @Autowired constructor(
             throw ResponseStatusException(HttpStatus.CONFLICT)
 
         val newBoardSaved = boardRepository.save(newBoard)
-        auditLogRepository.save(Audit.forEntity(newBoardSaved, selfUser, Audit.Action.BOARD_CREATE))
+        auditLogRepository.save(Audit.of(newBoardSaved, selfUser, Audit.Action.BOARD_CREATE))
         return BoardJson(newBoardSaved)
             .includeId()
             .includeTitle()
@@ -81,7 +81,7 @@ class BoardManagement @Autowired constructor(
         }
 
         val updatedBoardSaved = boardRepository.save(board)
-        auditLogRepository.save(Audit.forEntity(updatedBoardSaved, selfUser, Audit.Action.BOARD_MODIFY))
+        auditLogRepository.save(Audit.of(updatedBoardSaved, selfUser, Audit.Action.BOARD_MODIFY))
         return BoardJson(updatedBoardSaved)
             .includeId()
             .includeTitle()
@@ -103,7 +103,7 @@ class BoardManagement @Autowired constructor(
         if (!selfUser.isAdmin && board.ownerUUID != selfUser.uuid)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         boardRepository.delete(board)
-        auditLogRepository.save(Audit.forEntity(board, selfUser, Audit.Action.BOARD_DELETE))
+        auditLogRepository.save(Audit.of(board, selfUser, Audit.Action.BOARD_DELETE))
     }
 
 }

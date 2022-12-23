@@ -52,7 +52,7 @@ class MemberManagement @Autowired constructor(
         }
         membershipRequest.canView = true
         val savedMembershipRequest = memberRepository.save(membershipRequest)
-        auditLogRepository.save(Audit.forEntity(savedMembershipRequest, selfUser, Audit.Action.INVITE_ACCEPT))
+        auditLogRepository.save(Audit.of(savedMembershipRequest, selfUser, Audit.Action.INVITE_ACCEPT))
     }
 
     @PostMapping("/invite/{boardId}/{userUUID}")
@@ -76,12 +76,12 @@ class MemberManagement @Autowired constructor(
             invitedMember.userUUID = invitedUser.uuid
             invitedMember.status = Member.MembershipStatus.OFFERED
             invitedMember = memberRepository.save(invitedMember)
-            auditLogRepository.save(Audit.forEntity(invitedMember, selfUser, Audit.Action.INVITE_CREATE))
+            auditLogRepository.save(Audit.of(invitedMember, selfUser, Audit.Action.INVITE_CREATE))
         } else if (invitedMember.status == Member.MembershipStatus.REQUESTED) {
             invitedMember.status = Member.MembershipStatus.GRANTED
             invitedMember.canView = true
             invitedMember = memberRepository.save(invitedMember)
-            auditLogRepository.save(Audit.forEntity(invitedMember, selfUser, Audit.Action.MEMBERSHIP_GRANT))
+            auditLogRepository.save(Audit.of(invitedMember, selfUser, Audit.Action.MEMBERSHIP_GRANT))
         }
 
         return MemberJson(invitedMember)
@@ -119,7 +119,7 @@ class MemberManagement @Autowired constructor(
         }
 
         val updatedMember = memberRepository.save(member)
-        auditLogRepository.save(Audit.forEntity(updatedMember, selfUser, Audit.Action.MEMBERSHIP_MODIFY))
+        auditLogRepository.save(Audit.of(updatedMember, selfUser, Audit.Action.MEMBERSHIP_MODIFY))
         return MemberJson(updatedMember)
             .includeUser {
                 UserJson(updatedMember.user)
@@ -144,7 +144,7 @@ class MemberManagement @Autowired constructor(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         if (member.status != Member.MembershipStatus.BLOCKED) {
             memberRepository.delete(member)
-            auditLogRepository.save(Audit.forEntity(member, selfUser, Audit.Action.MEMBERSHIP_DELETE))
+            auditLogRepository.save(Audit.of(member, selfUser, Audit.Action.MEMBERSHIP_DELETE))
         }
     }
 

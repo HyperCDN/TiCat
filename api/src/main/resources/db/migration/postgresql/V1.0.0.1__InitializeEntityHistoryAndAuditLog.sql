@@ -10,17 +10,40 @@ CREATE TYPE AUDIT_ACTION AS ENUM (
 
 CREATE TABLE audit_log
 (
-    audit_id    BIGSERIAL    NOT NULL,
-    action_time TIMESTAMP    NOT NULL DEFAULT NOW(),
-    actor       UUID         NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
-    action      AUDIT_ACTION NOT NULL,
-    entity_hint TEXT         NOT NULL,
+    audit_id                BIGSERIAL    NOT NULL,
+    action_time             TIMESTAMP    NOT NULL DEFAULT NOW(),
+    actor                   UUID                  DEFAULT NULL,
+    entity_hint_actor       TEXT                  DEFAULT NULL,
+    action                  AUDIT_ACTION NOT NULL,
+
+    entity_reference_user   UUID                  DEFAULT NULL,
+    entity_hint_user        TEXT                  DEFAULT NULL,
+    entity_reference_board  VARCHAR(16)           DEFAULT NULL,
+    entity_hint_board       TEXT                  DEFAULT NULL,
+    entity_reference_ticket INT                   DEFAULT NULL,
+    entity_hint_ticket      TEXT                  DEFAULT NULL,
 
     PRIMARY KEY (audit_id),
     CONSTRAINT fk_actor
         FOREIGN KEY (actor)
             REFERENCES users (user_uuid)
             ON DELETE SET DEFAULT
+            ON UPDATE CASCADE,
+    CONSTRAINT fk_hint_user
+        FOREIGN KEY (entity_reference_user)
+            REFERENCES users (user_uuid)
+            ON DELETE SET DEFAULT
+            ON UPDATE CASCADE,
+    CONSTRAINT fk_hint_board
+        FOREIGN KEY (entity_reference_board)
+            REFERENCES boards (board_id)
+            ON DELETE SET DEFAULT
+            ON UPDATE CASCADE,
+    CONSTRAINT fk_hint_ticket
+        FOREIGN KEY (entity_reference_ticket)
+            REFERENCES tickets (ticket_id)
+            ON DELETE SET DEFAULT
+            ON UPDATE CASCADE
 );
 
 -- -- Representing changes made to a board which could be restored later

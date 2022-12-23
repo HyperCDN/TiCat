@@ -21,8 +21,7 @@ CREATE TABLE users
 
 -- Create placeholder users
 INSERT INTO users (user_uuid, first_name, last_name, display_name, email, is_system, is_admin, can_login, can_board_create, can_board_join)
-VALUES ('00000000-0000-4000-0000-000000000000', null, null, 'System', null, true, false, false, false, false),       -- Representing system user
-       ('00000000-0000-4000-0000-000000000001', null, null, 'Deleted User', null, true, false, false, false, false), -- Representing deleted users
+VALUES ('00000000-0000-4000-0000-000000000000', null, null, 'System', null, true, false, false, false, false), -- Representing system user
        ('00000000-0000-4000-0000-000000000002', null, null, 'Guest', null, true, false, true, false, false);
 -- Representing not logged in / guest users
 
@@ -38,8 +37,8 @@ CREATE TABLE boards
     created_at  TIMESTAMP         NOT NULL DEFAULT NOW(),
     modified_at TIMESTAMP         NOT NULL DEFAULT NOW(),
     title       VARCHAR(64)       NOT NULL,
-    description TEXT,
-    ownership   UUID              NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
+    description TEXT                       DEFAULT NULL,
+    ownership   UUID                       DEFAULT NULL,
     visibility  BOARD_VISIBILITY  NOT NULL DEFAULT 'MEMBERS_ONLY',
     access_mode BOARD_ACCESS_MODE NOT NULL DEFAULT 'MANUAL_ADD',
 
@@ -48,6 +47,7 @@ CREATE TABLE boards
         FOREIGN KEY (ownership)
             REFERENCES users (user_uuid)
             ON DELETE SET DEFAULT
+            ON UPDATE CASCADE
 );
 
 -- Board membership can be requested, offered, granted or blocked from requesting again
@@ -58,24 +58,26 @@ CREATE TABLE board_members
 (
     user_uuid        UUID                    NOT NULL,
     board_id         VARCHAR(16)             NOT NULL,
-    created_at       TIMESTAMP                        DEFAULT NOW(),
+    created_at       TIMESTAMP               NOT NULL DEFAULT NOW(),
     modified_at      TIMESTAMP               NOT NULL DEFAULT NOW(),
 
     status           BOARD_MEMBERSHIP_STATUS NOT NULL DEFAULT 'BLOCKED',
-    can_view         BOOLEAN                          DEFAULT false,
-    can_use          BOOLEAN                          DEFAULT false,
-    can_manage       BOOLEAN                          DEFAULT false,
-    can_administrate BOOLEAN                          DEFAULT false,
+    can_view         BOOLEAN                 NOT NULL DEFAULT false,
+    can_use          BOOLEAN                 NOT NULL DEFAULT false,
+    can_manage       BOOLEAN                 NOT NULL DEFAULT false,
+    can_administrate BOOLEAN                 NOT NULL DEFAULT false,
 
     PRIMARY KEY (user_uuid, board_id),
     CONSTRAINT fk_user
         FOREIGN KEY (user_uuid)
             REFERENCES users (user_uuid)
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
     CONSTRAINT fk_board
         FOREIGN KEY (board_id)
             REFERENCES boards (board_id)
             ON DELETE CASCADE
+            ON UPDATE CASCADE
 );
 
 -- Update guest member on visibility change
@@ -149,7 +151,7 @@ BEGIN
 END
 $$;
 
-CREATE TRIGGER apply_status_permission_override
+CREATE TRIGGER APPLY_STATUS_PERMISSION_OVERRIDES
     BEFORE INSERT OR UPDATE OF status
     ON board_members
     FOR EACH ROW
@@ -167,29 +169,32 @@ CREATE TABLE tickets
 (
     ticket_id   INT                      DEFAULT -1,
     board_id    VARCHAR(16)     NOT NULL,
-    created_at  TIMESTAMP                DEFAULT NOW(),
+    created_at  TIMESTAMP       NOT NULL DEFAULT NOW(),
     modified_at TIMESTAMP       NOT NULL DEFAULT NOW(),
-    created_by  UUID            NOT NULL DEFAULT '00000000-0000-4000-0000-000000000001',
+    created_by  UUID                     DEFAULT NULL,
     category    TICKET_CATEGORY NOT NULL,
     priority    TICKET_PRIORITY NOT NULL DEFAULT 'NORMAL',
     status      TICKET_STATUS   NOT NULL DEFAULT 'OPEN',
     title       VARCHAR(100)    NOT NULL,
-    content     TEXT,
+    content     TEXT                     DEFAULT NULL,
     assignee    UUID                     DEFAULT NULL,
 
     PRIMARY KEY (ticket_id, board_id),
     CONSTRAINT fk_user
         FOREIGN KEY (created_by)
             REFERENCES users (user_uuid)
-            ON DELETE SET DEFAULT,
+            ON DELETE SET DEFAULT
+            ON UPDATE CASCADE,
     CONSTRAINT fk_board
         FOREIGN KEY (board_id)
             REFERENCES boards (board_id)
-            ON DELETE CASCADE,
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
     CONSTRAINT fk_assignee
         FOREIGN KEY (created_by)
             REFERENCES users (user_uuid)
-            ON DELETE SET NULL
+            ON DELETE SET DEFAULT
+            ON UPDATE CASCADE
 );
 
 -- create trigger to set the ticket id to increasing values based on the board; As seen https://stackoverflow.com/a/34571410
@@ -211,7 +216,7 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER ticket_id_increment
+CREATE TRIGGER TICKET_ID_INCREMENT
     BEFORE INSERT
     ON tickets
     FOR EACH ROW

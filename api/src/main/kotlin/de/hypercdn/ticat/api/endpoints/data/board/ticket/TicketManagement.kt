@@ -50,7 +50,7 @@ class TicketManagement @Autowired constructor(
         }
 
         val savedTicket = ticketRepository.save(newTicket)
-        auditLogRepository.save(Audit.forEntity(savedTicket, selfUser, Audit.Action.TICKET_CREATE))
+        auditLogRepository.save(Audit.of(savedTicket, selfUser, Audit.Action.TICKET_CREATE))
         return TicketJson(savedTicket)
             .includeId()
             .includeTitle()
@@ -93,7 +93,7 @@ class TicketManagement @Autowired constructor(
         }
 
         val updatedTicket = ticketRepository.save(ticket)
-        auditLogRepository.save(Audit.forEntity(updatedTicket, selfUser, Audit.Action.TICKET_MODIFY))
+        auditLogRepository.save(Audit.of(updatedTicket, selfUser, Audit.Action.TICKET_MODIFY))
         return TicketJson(updatedTicket)
             .includeId()
             .includeTitle()
@@ -127,12 +127,12 @@ class TicketManagement @Autowired constructor(
 
         return if (actualDelete && selfMember.hasEffectiveManagementPower()) {
             ticketRepository.delete(ticket)
-            auditLogRepository.save(Audit.forEntity(ticket, selfUser, Audit.Action.TICKET_DELETE))
+            auditLogRepository.save(Audit.of(ticket, selfUser, Audit.Action.TICKET_DELETE))
             null
         } else {
             ticket.status = Ticket.Status.CLOSED
             val savedTicket = ticketRepository.save(ticket)
-            auditLogRepository.save(Audit.forEntity(savedTicket, selfUser, Audit.Action.TICKET_MODIFY))
+            auditLogRepository.save(Audit.of(savedTicket, selfUser, Audit.Action.TICKET_MODIFY))
             TicketJson(savedTicket)
                 .includeId()
                 .includeTitle()

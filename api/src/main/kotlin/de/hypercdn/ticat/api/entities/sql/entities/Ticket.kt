@@ -1,6 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
-import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import lombok.NoArgsConstructor
@@ -14,7 +13,7 @@ import java.util.*
 @Table(name = "tickets")
 @DynamicInsert
 @DynamicUpdate
-class Ticket : EntityHint {
+class Ticket {
 
     @NoArgsConstructor
     class Key(
@@ -42,8 +41,10 @@ class Ticket : EntityHint {
     @PrimaryKeyJoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "board_id", referencedColumnName = "board_id",
-        insertable = false, updatable = false
+        name = "board_id",
+        referencedColumnName = "board_id",
+        insertable = false,
+        updatable = false
     )
     lateinit var board: Board
 
@@ -66,17 +67,19 @@ class Ticket : EntityHint {
 
     @Column(
         name = "created_by",
-        nullable = false,
         updatable = false
     )
-    lateinit var creatorUUID: UUID
+    @ColumnDefault("NULL")
+    var creatorUUID: UUID? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "created_by", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false
+        name = "created_by",
+        referencedColumnName = "user_uuid",
+        insertable = false,
+        updatable = false
     )
-    lateinit var creator: User
+    var creator: User? = null
 
     @Column(
         name = "category",
@@ -109,10 +112,10 @@ class Ticket : EntityHint {
 
     @Column(
         name = "content",
-        nullable = false
+        nullable = true
     )
-    @ColumnDefault("")
-    var content: String = ""
+    @ColumnDefault("NULL")
+    var content: String? = null
 
     @Column(
         name = "assignee",
@@ -123,8 +126,10 @@ class Ticket : EntityHint {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "assignee", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false
+        name = "assignee",
+        referencedColumnName = "user_uuid",
+        insertable = false,
+        updatable = false
     )
     var assignee: User? = null
 
@@ -146,10 +151,6 @@ class Ticket : EntityHint {
         OPEN,
         CLOSED,
         DELETED
-    }
-
-    override fun asHint(): String {
-        return "ticket#$boardId:$id"
     }
 
     override fun toString(): String {

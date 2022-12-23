@@ -1,6 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
-import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import lombok.NoArgsConstructor
@@ -14,7 +13,7 @@ import java.util.*
 @Table(name = "board_members")
 @DynamicInsert
 @DynamicUpdate
-class Member : EntityHint {
+class Member {
 
     @NoArgsConstructor
     class Key(
@@ -33,8 +32,10 @@ class Member : EntityHint {
     @PrimaryKeyJoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "user_uuid", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false
+        name = "user_uuid",
+        referencedColumnName = "user_uuid",
+        insertable = false,
+        updatable = false
     )
     lateinit var user: User
 
@@ -49,8 +50,10 @@ class Member : EntityHint {
     @PrimaryKeyJoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "board_id", referencedColumnName = "board_id",
-        insertable = false, updatable = false
+        name = "board_id",
+        referencedColumnName = "board_id",
+        insertable = false,
+        updatable = false
     )
     lateinit var board: Board
 
@@ -112,10 +115,6 @@ class Member : EntityHint {
         OFFERED,
         GRANTED,
         BLOCKED
-    }
-
-    override fun asHint(): String {
-        TODO("Not yet implemented")
     }
 
     override fun toString(): String {

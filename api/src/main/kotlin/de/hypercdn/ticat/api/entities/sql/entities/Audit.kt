@@ -1,6 +1,5 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
-import de.hypercdn.ticat.api.entities.sql.shared.EntityHint
 import jakarta.persistence.*
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.CreationTimestamp
@@ -31,17 +30,24 @@ class Audit {
 
     @Column(
         name = "actor",
-        nullable = false,
         updatable = false
     )
-    lateinit var actorUUID: UUID
+    var actorUUID: UUID? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "actor", referencedColumnName = "user_uuid",
-        insertable = false, updatable = false
+        name = "actor",
+        referencedColumnName = "user_uuid",
+        insertable = false,
+        updatable = false
     )
-    lateinit var actor: User
+    var actor: User? = null
+
+    @Column(
+        name = "entity_hint_actor",
+        updatable = false
+    )
+    var entityHintActor: String? = null
 
     @Column(
         name = "action",
@@ -52,11 +58,77 @@ class Audit {
     lateinit var action: Action
 
     @Column(
-        name = "entity_hint",
-        nullable = false,
+        name = "entity_reference_user",
         updatable = false
     )
-    lateinit var entityHint: String
+    var entityReferenceUserUUID: UUID? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "entity_reference_user",
+        referencedColumnName = "user_uuid",
+        insertable = false,
+        updatable = false
+    )
+    var entityReferenceUser: User? = null
+
+    @Column(
+        name = "entity_hint_user",
+        updatable = false
+    )
+    var entityHintUser: String? = null
+
+    @Column(
+        name = "entity_reference_board",
+        updatable = false
+    )
+    var entityReferenceBoardId: String? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "entity_reference_board",
+        referencedColumnName = "board_id",
+        insertable = false,
+        updatable = false
+    )
+    var entityReferenceBoard: Board? = null
+
+    @Column(
+        name = "entity_hint_board",
+        updatable = false
+    )
+    var entityHintBoard: String? = null
+
+    @Column(
+        name = "entity_reference_ticket",
+        updatable = false
+    )
+    var entityReferenceTicketId: Int? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns(
+        value = [
+            JoinColumn(
+                name = "entity_reference_board",
+                referencedColumnName = "board_id",
+                insertable = false,
+                updatable = false
+            ),
+            JoinColumn(
+                name = "entity_reference_ticket",
+                referencedColumnName = "ticket_id",
+                insertable = false,
+                updatable = false
+            )
+        ]
+    )
+    var entityReferenceTicket: Ticket? = null
+
+    @Column(
+        name = "entity_hint_ticket",
+        updatable = false
+    )
+    var entityHintTicket: String? = null
 
     enum class Action {
         USER_MODIFY,
@@ -66,20 +138,46 @@ class Audit {
     }
 
     override fun toString(): String {
-        return "Audit $id ($action on $entityHint)"
+        return "Audit $id"
     }
 
     companion object {
 
-        fun forEntity(entity: EntityHint, actor: User, action: Action): Audit {
+        fun of(entity: Any, actor: User, action: Action): Audit {
             val audit = Audit()
-            audit.entityHint = entity.asHint()
+            when (entity) {
+                is User -> {
+                    audit.entityReferenceUserUUID = entity.uuid
+                    audit.entityHintUser = entity.displayName
+                }
+
+                is Board -> {
+                    audit.entityReferenceBoardId = entity.id
+                    audit.entityHintBoard = entity.id
+                }
+
+                is Member -> {
+                    audit.entityReferenceUserUUID = entity.userUUID
+                    audit.entityHintUser = entity.user.displayName
+                    audit.entityReferenceBoardId = entity.boardId
+                    audit.entityHintBoard = entity.board.id
+                }
+
+                is Ticket -> {
+                    audit.entityReferenceBoardId = entity.boardId
+                    audit.entityHintBoard = entity.board.id
+                    audit.entityReferenceTicketId = entity.id
+                    audit.entityHintTicket = entity.id.toString()
+                }
+
+                else -> throw IllegalArgumentException("Bad entity provided")
+            }
             audit.actorUUID = actor.uuid
+            audit.entityHintActor = actor.displayName
             audit.action = action
             return audit
         }
 
     }
-
 
 }
