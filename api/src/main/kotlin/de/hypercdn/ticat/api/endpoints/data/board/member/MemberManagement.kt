@@ -43,9 +43,8 @@ class MemberManagement @Autowired constructor(
             auditLogRepository.save(Audit.of(selfMembership, selfUser, Audit.Action.INVITE_ACCEPT))
             return
         }
-        if (!selfUser.isAdmin && (!selfUser.canBoardJoin || !board.isVisibleTo(selfUser))) {
+        if (!selfUser.isAdmin && (!selfUser.canBoardJoin || !board.isVisibleTo(selfUser)))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         val membershipRequest = Member.newFor(
             board, selfUser, when (board.accessMode) {
                 Board.AccessMode.PUBLIC_JOIN -> Member.MembershipStatus.GRANTED
@@ -73,12 +72,10 @@ class MemberManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true) {
+        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
         val invitedUser = userRepository.findById(userUUID).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-
         var invitedMember = memberRepository.findById(Member.Key(invitedUser.uuid, board.id)).orElse(null)
         if (invitedMember == null) {
             invitedMember = Member.newFor(board, invitedUser, Member.MembershipStatus.OFFERED, MemberJson.Permissions.MIN)
@@ -92,7 +89,6 @@ class MemberManagement @Autowired constructor(
             invitedMember = memberRepository.save(invitedMember)
             auditLogRepository.save(Audit.of(invitedMember, selfUser, Audit.Action.MEMBERSHIP_GRANT))
         }
-
         return MemberJson(invitedMember)
             .includeUser {
                 UserJson(invitedUser)
@@ -116,9 +112,7 @@ class MemberManagement @Autowired constructor(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-
         requestBody.versionBaseTimestamp?.let { if (member.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
-
         requestBody.block?.let { if (selfMember.hasEffectiveAdministrationPower() && it) member.status = Member.MembershipStatus.BLOCKED }
         requestBody.permissions?.let {
             it.canView?.let { v -> member.canView = v }
@@ -126,7 +120,6 @@ class MemberManagement @Autowired constructor(
             it.canManage?.let { v -> member.canManage = v }
             it.canAdministrate?.let { v -> if (selfMember.hasEffectiveAdministrationPower()) member.canAdministrate = v }
         }
-
         val updatedMember = memberRepository.save(member)
         auditLogRepository.save(Audit.of(updatedMember, selfUser, Audit.Action.MEMBERSHIP_MODIFY))
         return MemberJson(updatedMember)

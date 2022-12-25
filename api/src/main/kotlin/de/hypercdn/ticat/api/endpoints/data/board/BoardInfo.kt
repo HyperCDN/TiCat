@@ -37,21 +37,21 @@ class BoardInfo @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val pageRequest = PageRequest.of(page, chunkSize)
         val boards = boardRepository.getBoardsAvailableTo(selfUser)
-        val paged = PagedData<BoardJson>(pageRequest)
-        paged.entities = boards.stream()
-            .map {
-                BoardJson(it)
-                    .includeId()
-                    .includeTitle()
-                    .includeOwner {
-                        UserJson(it.owner)
-                            .includeId()
-                            .includeName()
-                            .includeFullName(skip = !User.isAuthenticated())
-                    }
-            }
-            .toList()
-        return paged
+        return PagedData<BoardJson>(pageRequest).apply {
+            entities = boards.stream()
+                .map {
+                    BoardJson(it)
+                        .includeId()
+                        .includeTitle()
+                        .includeOwner {
+                            UserJson(it.owner)
+                                .includeId()
+                                .includeName()
+                                .includeFullName(skip = !User.isAuthenticated())
+                        }
+                }
+                .toList()
+        }
     }
 
     @GetMapping("/board/{boardId}")

@@ -20,25 +20,109 @@ class AuditJson(
     @JsonInclude(JsonInclude.Include.NON_NULL)
     var actionTime: OffsetDateTime? = null
 
-    @JsonProperty(value = "actor", required = false)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    var actor: UserJson? = null
-
     @JsonProperty(value = "action", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     var action: Audit.Action? = null
 
-    @JsonProperty(value = "entityHint", required = false)
+    @JsonProperty(value = "referenceEntities", required = false)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    var entityHint: String? = null
+    var referenceEntities: ReferenceEntities? = null
 
-    fun includeAll(skip: Boolean = false): AuditJson {
+    class ReferenceEntities {
+
+        @JsonProperty(value = "actor", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var actor: UserJson? = null
+
+        @JsonProperty(value = "user", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var user: UserJson? = null
+
+        @JsonProperty(value = "board", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var board: BoardJson? = null
+
+        @JsonProperty(value = "ticket", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var ticket: TicketJson? = null
+
+    }
+
+    @JsonProperty(value = "entityHints", required = false)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var entityHints: EntityHints? = null
+
+    class EntityHints {
+
+        @JsonProperty(value = "actor", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var actor: String? = null
+
+        @JsonProperty(value = "user", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var user: String? = null
+
+        @JsonProperty(value = "board", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var board: String? = null
+
+        @JsonProperty(value = "ticket", required = false)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        var ticket: String? = null
+
+    }
+
+    fun includeBasic(skip: Boolean = false): AuditJson {
         if (skip) return this
         id = audit?.id
         actionTime = audit?.actionTime
-        actor = UserJson(audit?.actor).includeId().includeName()
         action = audit?.action
-        entityHint = audit?.entityHint
+        entityHints = (entityHints ?: EntityHints()).apply {
+            actor = audit?.entityHintActor
+        }
+        referenceEntities = (referenceEntities ?: ReferenceEntities()).apply {
+            actor = UserJson(audit?.actor)
+                .includeId()
+                .includeName()
+        }
+        return this
+    }
+
+    fun includeEntityHints(skip: Boolean = false): AuditJson {
+        if (skip) return this
+        entityHints = (entityHints ?: EntityHints()).apply {
+            actor = audit?.entityHintActor
+            user = audit?.entityHintUser
+            board = audit?.entityHintBoard
+            ticket = audit?.entityHintTicket
+        }
+        return this
+    }
+
+    fun includeReferenceEntities(skip: Boolean = false): AuditJson {
+        if (skip) return this
+        referenceEntities = (referenceEntities ?: ReferenceEntities()).apply {
+            audit?.actor?.let {
+                actor = UserJson(audit.actor)
+                    .includeId()
+                    .includeName()
+            }
+            audit?.entityReferenceUser?.let {
+                user = UserJson(audit.entityReferenceUser)
+                    .includeId()
+                    .includeName()
+            }
+            audit?.entityReferenceBoard?.let {
+                board = BoardJson(audit.entityReferenceBoard)
+                    .includeId()
+                    .includeTitle()
+            }
+            audit?.entityReferenceTicket?.let {
+                ticket = TicketJson(audit.entityReferenceTicket)
+                    .includeId()
+                    .includeTitle()
+            }
+        }
         return this
     }
 

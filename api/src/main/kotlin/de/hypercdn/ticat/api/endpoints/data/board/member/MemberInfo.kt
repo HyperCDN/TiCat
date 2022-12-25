@@ -44,27 +44,26 @@ class MemberInfo @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         val pageRequest = PageRequest.of(page, chunkSize)
         val members = memberRepository.getMembersOf(board, pageRequest, !selfMember.hasEffectiveManagementPower())
-        val pagedData = PagedData<MemberJson>(pageRequest)
-        pagedData.entities = members.stream()
-            .map {
-                MemberJson(it)
-                    .includeUser {
-                        UserJson(it.user)
-                            .includeId()
-                            .includeName()
-                    }
-                    .includeBoard {
-                        BoardJson(it.board)
-                            .includeId()
-                    }
-                    .includePermissions(skip = selfMember.userUUID != selfUser.uuid && !selfMember.hasEffectiveManagementPower())
-                    .includeStatus(skip = !selfMember.hasEffectiveManagementPower())
-            }
-            .toList()
-        return pagedData
+        return PagedData<MemberJson>(pageRequest).apply {
+            entities = members.stream()
+                .map {
+                    MemberJson(it)
+                        .includeUser {
+                            UserJson(it.user)
+                                .includeId()
+                                .includeName()
+                        }
+                        .includeBoard {
+                            BoardJson(it.board)
+                                .includeId()
+                        }
+                        .includePermissions(skip = selfMember.userUUID != selfUser.uuid && !selfMember.hasEffectiveManagementPower())
+                        .includeStatus(skip = !selfMember.hasEffectiveManagementPower())
+                }
+                .toList()
+        }
     }
 
     @GetMapping("/member/{boardId}/{userUUID}")
@@ -77,7 +76,6 @@ class MemberInfo @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return MemberJson(member)

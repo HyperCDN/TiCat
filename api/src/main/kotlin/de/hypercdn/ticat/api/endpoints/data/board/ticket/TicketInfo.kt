@@ -46,28 +46,27 @@ class TicketInfo @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         val pageRequest = PageRequest.of(page, chunkSize)
         val tickets = ticketRepository.getTicketsOf(board, pageRequest)
-        val pagedData = PagedData<TicketJson>(pageRequest)
-        pagedData.entities = tickets.stream()
-            .map {
-                TicketJson(it)
-                    .includeId()
-                    .includeTitle()
-                    .includeBoard {
-                        BoardJson(it.board)
-                            .includeId()
-                    }
-                    .includeCreator {
-                        UserJson(it.creator)
-                            .includeId()
-                            .includeName()
-                    }
-                    .includeProperties()
-            }
-            .toList()
-        return pagedData
+        return PagedData<TicketJson>(pageRequest).apply {
+            entities = tickets.stream()
+                .map {
+                    TicketJson(it)
+                        .includeId()
+                        .includeTitle()
+                        .includeBoard {
+                            BoardJson(it.board)
+                                .includeId()
+                        }
+                        .includeCreator {
+                            UserJson(it.creator)
+                                .includeId()
+                                .includeName()
+                        }
+                        .includeProperties()
+                }
+                .toList()
+        }
     }
 
     @GetMapping("/ticket/{boardId}/{ticketId}")
@@ -80,7 +79,6 @@ class TicketInfo @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         val ticket = ticketRepository.getTicketIfExists(Ticket.Key(ticketId, board.id))
         return TicketJson(ticket)
             .includeId()

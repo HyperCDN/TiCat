@@ -29,19 +29,14 @@ class UserManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         if (!selfUser.isAdmin) throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val user = userRepository.findById(userUUID).orElse(null)
-
         requestBody.versionBaseTimestamp?.let { if (user.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
-
         requestBody.permissions?.let {
             it.canLogin?.let { v -> user.canLogin = v }
             it.canBoardCreate?.let { v -> user.canBoardCreate = v }
             it.canBoardJoin?.let { v -> user.canBoardJoin = v }
         }
-
         val updatedUserSaved = userRepository.save(user)
-
         auditLogRepository.save(Audit.of(user, selfUser, Audit.Action.USER_MODIFY))
-
         return UserJson(updatedUserSaved)
             .includeAll()
     }

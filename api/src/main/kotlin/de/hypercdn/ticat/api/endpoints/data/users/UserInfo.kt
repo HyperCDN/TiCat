@@ -29,16 +29,16 @@ class UserInfo @Autowired constructor(
     ): PagedData<UserJson> {
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
         val users = userRepository.findAllById(userUUIDs)
-        val paged = PagedData<UserJson>(PageRequest.of(-1, userUUIDs.size))
-        paged.entities = users.stream().map {
-            UserJson(it)
-                .includeId()
-                .includeName()
-                .includeFullName(skip = !User.isAuthenticated())
-                .includeEmail(skip = !User.isAuthenticated())
-                .includePermissions(skip = selfUser.uuid != it.uuid && !selfUser.isAdmin)
-        }.toList()
-        return paged
+        return PagedData<UserJson>(PageRequest.of(-1, userUUIDs.size)).apply {
+            entities = users.stream().map {
+                UserJson(it)
+                    .includeId()
+                    .includeName()
+                    .includeFullName(skip = !User.isAuthenticated())
+                    .includeEmail(skip = !User.isAuthenticated())
+                    .includePermissions(skip = selfUser.uuid != it.uuid && !selfUser.isAdmin)
+            }.toList()
+        }
     }
 
     @GetMapping("/user/{userUUID}")

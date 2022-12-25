@@ -36,7 +36,6 @@ class TicketManagement @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         val newTicket = Ticket()
         newTicket.boardId = board.id
         newTicket.creatorUUID = selfUser.uuid
@@ -48,7 +47,6 @@ class TicketManagement @Autowired constructor(
             it.priority?.let { v -> newTicket.priority = v }
             it.status?.let { v -> newTicket.status = v }
         }
-
         val savedTicket = ticketRepository.save(newTicket)
         auditLogRepository.save(Audit.of(savedTicket, selfUser, Audit.Action.TICKET_CREATE))
         return TicketJson(savedTicket)
@@ -80,9 +78,7 @@ class TicketManagement @Autowired constructor(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val ticket = ticketRepository.findById(Ticket.Key(ticketId, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-
         requestBody.versionBaseTimestamp?.let { if (ticket.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
-
         requestBody.title?.let { ticket.title = it }
         requestBody.content?.let { ticket.content = it }
         requestBody.assigneeUUID?.let { ticket.assigneeUUID = it }
@@ -91,7 +87,6 @@ class TicketManagement @Autowired constructor(
             it.priority?.let { v -> ticket.priority = v }
             it.status?.let { v -> ticket.status = v }
         }
-
         val updatedTicket = ticketRepository.save(ticket)
         auditLogRepository.save(Audit.of(updatedTicket, selfUser, Audit.Action.TICKET_MODIFY))
         return TicketJson(updatedTicket)
@@ -124,7 +119,6 @@ class TicketManagement @Autowired constructor(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val ticket = ticketRepository.findById(Ticket.Key(ticketId, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-
         return if (actualDelete && selfMember.hasEffectiveManagementPower()) {
             ticketRepository.delete(ticket)
             auditLogRepository.save(Audit.of(ticket, selfUser, Audit.Action.TICKET_DELETE))

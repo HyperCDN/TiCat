@@ -37,9 +37,8 @@ class BoardManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         if (!selfUser.canBoardCreate)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         val newBoard = Board()
-        newBoard.id = requestBody.id!!
+        newBoard.id = requestBody.id!!.uppercase()
         newBoard.title = requestBody.title!!
         requestBody.description?.let { newBoard.description = it }
         requestBody.settings?.let {
@@ -48,18 +47,14 @@ class BoardManagement @Autowired constructor(
         }
         if (boardRepository.existsById(newBoard.id))
             throw ResponseStatusException(HttpStatus.CONFLICT)
-
         val newBoardSaved = boardRepository.save(newBoard)
         auditLogRepository.save(Audit.of(newBoardSaved, selfUser, Audit.Action.BOARD_CREATE))
-
         val owner = Member.newFor(newBoardSaved, selfUser, Member.MembershipStatus.GRANTED, MemberJson.Permissions.ALL)
         memberRepository.save(owner)
         auditLogRepository.save(Audit.of(owner, selfUser, Audit.Action.MEMBERSHIP_GRANT))
-
         val guest = Member.newFor(newBoardSaved, selfUser, if (newBoardSaved.visibility == Board.Visibility.ANYONE) Member.MembershipStatus.GRANTED else Member.MembershipStatus.BLOCKED, MemberJson.Permissions.MIN)
         memberRepository.save(guest)
         auditLogRepository.save(Audit.of(guest, selfUser, Audit.Action.MEMBERSHIP_GRANT))
-
         return BoardJson(newBoardSaved)
             .includeId()
             .includeTitle()
@@ -81,9 +76,7 @@ class BoardManagement @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-
         requestBody.versionBaseTimestamp?.let { if (board.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
-
         requestBody.title?.let { board.title = it }
         requestBody.description?.let { board.description = it }
         requestBody.settings?.let {
@@ -99,7 +92,6 @@ class BoardManagement @Autowired constructor(
             }
             it.accessMode?.let { v -> board.accessMode = v }
         }
-
         val updatedBoardSaved = boardRepository.save(board)
         auditLogRepository.save(Audit.of(updatedBoardSaved, selfUser, Audit.Action.BOARD_MODIFY))
         return BoardJson(updatedBoardSaved)
