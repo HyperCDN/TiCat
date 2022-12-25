@@ -68,24 +68,16 @@ class TicketJson(
 
     fun includeBoard(skip: Boolean = false, boardSupplier: Supplier<BoardJson>? = null): TicketJson {
         if (skip) return this
-        if (boardSupplier == null) {
-            val tmp = BoardJson()
-            tmp.id = ticket?.boardId
-            board = tmp
-        } else {
-            board = boardSupplier.get()
+        board = boardSupplier?.get() ?: BoardJson().apply {
+            id = ticket?.boardId
         }
         return this
     }
 
     fun includeCreator(skip: Boolean = false, creatorSupplier: Supplier<UserJson>? = null): TicketJson {
         if (skip) return this
-        if (creatorSupplier == null) {
-            val tmp = UserJson()
-            tmp.id = ticket?.creatorUUID
-            assignee = tmp
-        } else {
-            assignee = creatorSupplier.get()
+        creator = creatorSupplier?.get() ?: UserJson().apply {
+            ticket?.creatorUUID
         }
         return this
     }
@@ -104,23 +96,19 @@ class TicketJson(
 
     fun includeAssignee(skip: Boolean = false, assigneeSupplier: Supplier<UserJson>? = null): TicketJson {
         if (skip) return this
-        if (assigneeSupplier == null) {
-            val tmp = UserJson()
-            tmp.id = ticket?.assigneeUUID
-            assignee = tmp
-        } else {
-            assignee = assigneeSupplier.get()
+        assignee = assigneeSupplier?.get() ?: UserJson().apply {
+            ticket?.creatorUUID
         }
         return this
     }
 
     fun includeProperties(skip: Boolean = false): TicketJson {
         if (skip) return this
-        val tmp = Properties()
-        tmp.category = ticket?.category
-        tmp.priority = ticket?.priority
-        tmp.status = ticket?.status
-        properties = tmp
+        properties = Properties().apply {
+            category = ticket?.category
+            priority = ticket?.priority
+            status = ticket?.status
+        }
         return this
     }
 

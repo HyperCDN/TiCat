@@ -1,5 +1,6 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
+import de.hypercdn.ticat.api.entities.json.out.MemberJson
 import jakarta.persistence.*
 import jakarta.persistence.Table
 import lombok.NoArgsConstructor
@@ -119,6 +120,23 @@ class Member {
 
     override fun toString(): String {
         return "Member ${user.displayName} ($boardId, $userUUID)"
+    }
+
+    companion object {
+
+        fun newFor(board: Board, user: User, membershipStatus: MembershipStatus, permissions: MemberJson.Permissions): Member {
+            val member = Member().apply {
+                boardId = board.id
+                userUUID = user.uuid
+                status = membershipStatus
+                permissions.canView?.let { canView = it }
+                permissions.canUse?.let { canUse = it }
+                permissions.canManage?.let { canManage = it }
+                permissions.canAdministrate?.let { canAdministrate = it }
+            }
+            return member
+        }
+
     }
 
 }

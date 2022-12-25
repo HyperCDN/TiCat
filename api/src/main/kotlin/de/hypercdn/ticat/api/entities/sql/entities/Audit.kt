@@ -144,38 +144,38 @@ class Audit {
     companion object {
 
         fun of(entity: Any, actor: User, action: Action): Audit {
-            val audit = Audit()
-            when (entity) {
-                is User -> {
-                    audit.entityReferenceUserUUID = entity.uuid
-                    audit.entityHintUser = entity.displayName
-                }
+            return Audit().apply {
+                this.actorUUID = actor.uuid
+                this.entityHintActor = actor.displayName
+                this.action = action
+                when (entity) {
+                    is User -> {
+                        this.entityReferenceUserUUID = entity.uuid
+                        this.entityHintUser = entity.displayName
+                    }
 
-                is Board -> {
-                    audit.entityReferenceBoardId = entity.id
-                    audit.entityHintBoard = entity.id
-                }
+                    is Board -> {
+                        this.entityReferenceBoardId = entity.id
+                        this.entityHintBoard = entity.id
+                    }
 
-                is Member -> {
-                    audit.entityReferenceUserUUID = entity.userUUID
-                    audit.entityHintUser = entity.user.displayName
-                    audit.entityReferenceBoardId = entity.boardId
-                    audit.entityHintBoard = entity.board.id
-                }
+                    is Member -> {
+                        this.entityReferenceUserUUID = entity.userUUID
+                        this.entityHintUser = entity.user.displayName
+                        this.entityReferenceBoardId = entity.boardId
+                        this.entityHintBoard = entity.board.id
+                    }
 
-                is Ticket -> {
-                    audit.entityReferenceBoardId = entity.boardId
-                    audit.entityHintBoard = entity.board.id
-                    audit.entityReferenceTicketId = entity.id
-                    audit.entityHintTicket = entity.id.toString()
-                }
+                    is Ticket -> {
+                        this.entityReferenceBoardId = entity.boardId
+                        this.entityHintBoard = entity.board.id
+                        this.entityReferenceTicketId = entity.id
+                        this.entityHintTicket = entity.id.toString()
+                    }
 
-                else -> throw IllegalArgumentException("Bad entity provided")
+                    else -> throw IllegalArgumentException("Bad entity provided")
+                }
             }
-            audit.actorUUID = actor.uuid
-            audit.entityHintActor = actor.displayName
-            audit.action = action
-            return audit
         }
 
     }

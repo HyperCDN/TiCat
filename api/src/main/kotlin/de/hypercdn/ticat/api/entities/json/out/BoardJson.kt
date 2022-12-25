@@ -68,21 +68,18 @@ class BoardJson(
 
     fun includeOwner(skip: Boolean = false, userSupplier: Supplier<UserJson>? = null): BoardJson {
         if (skip) return this
-        if (userSupplier == null) {
-            val tmp = UserJson()
-            tmp.id = board?.ownerUUID
-            owner = tmp
-        } else {
-            owner = userSupplier.get()
+        owner = userSupplier?.get() ?: UserJson().apply {
+            id = board?.ownerUUID
         }
         return this
     }
 
     fun includeSettings(skip: Boolean = false): BoardJson {
         if (skip) return this
-        val tmp = Settings()
-        tmp.visibility = board?.visibility
-        tmp.accessMode = board?.accessMode
+        settings = Settings().apply {
+            visibility = board?.visibility
+            accessMode = board?.accessMode
+        }
         return this
     }
 

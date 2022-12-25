@@ -7,6 +7,7 @@ import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.entities.Audit
 import de.hypercdn.ticat.api.entities.sql.entities.Board
 import de.hypercdn.ticat.api.entities.sql.entities.Member
+import de.hypercdn.ticat.api.entities.sql.entities.User.Companion.INTERNAL_USER_UUIDS
 import de.hypercdn.ticat.api.entities.sql.repo.AuditLogRepository
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
@@ -32,27 +33,36 @@ class MemberManagement @Autowired constructor(
         val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
         val board = boardRepository.getBoardIfExists(boardId)
         val selfMembership = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
-        if (selfMembership != null) {
+        if (selfMembership != null) { // invited
             if (selfMembership.status != Member.MembershipStatus.OFFERED) return
-            selfMembership.status = Member.MembershipStatus.GRANTED
-            selfMembership.canView = true
+            selfMembership.apply {
+                status = Member.MembershipStatus.GRANTED
+                canView = true
+            }
             memberRepository.save(selfMembership)
+            auditLogRepository.save(Audit.of(selfMembership, selfUser, Audit.Action.INVITE_ACCEPT))
             return
         }
         if (!selfUser.isAdmin && (!selfUser.canBoardJoin || !board.isVisibleTo(selfUser))) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
-        val membershipRequest = Member()
-        membershipRequest.boardId = board.id
-        membershipRequest.userUUID = selfUser.uuid
-        membershipRequest.status = when (board.accessMode) {
-            Board.AccessMode.PUBLIC_JOIN -> Member.MembershipStatus.GRANTED
-            Board.AccessMode.MANUAL_VERIFY -> Member.MembershipStatus.REQUESTED
-            else -> throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
-        membershipRequest.canView = true
+        val membershipRequest = Member.newFor(
+            board, selfUser, when (board.accessMode) {
+                Board.AccessMode.PUBLIC_JOIN -> Member.MembershipStatus.GRANTED
+                Board.AccessMode.MANUAL_VERIFY -> Member.MembershipStatus.REQUESTED
+                else -> throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            }, MemberJson.Permissions.MIN
+        )
         val savedMembershipRequest = memberRepository.save(membershipRequest)
-        auditLogRepository.save(Audit.of(savedMembershipRequest, selfUser, Audit.Action.INVITE_ACCEPT))
+        auditLogRepository.save(
+            Audit.of(
+                savedMembershipRequest, selfUser, when (savedMembershipRequest.status) {
+                    Member.MembershipStatus.GRANTED -> Audit.Action.MEMBERSHIP_GRANT
+                    Member.MembershipStatus.REQUESTED -> Audit.Action.INVITE_CREATE
+                    else -> throw ResponseStatusException(HttpStatus.FORBIDDEN)
+                }
+            )
+        )
     }
 
     @PostMapping("/invite/{boardId}/{userUUID}")
@@ -71,15 +81,14 @@ class MemberManagement @Autowired constructor(
 
         var invitedMember = memberRepository.findById(Member.Key(invitedUser.uuid, board.id)).orElse(null)
         if (invitedMember == null) {
-            invitedMember = Member()
-            invitedMember.boardId = board.id
-            invitedMember.userUUID = invitedUser.uuid
-            invitedMember.status = Member.MembershipStatus.OFFERED
+            invitedMember = Member.newFor(board, invitedUser, Member.MembershipStatus.OFFERED, MemberJson.Permissions.MIN)
             invitedMember = memberRepository.save(invitedMember)
             auditLogRepository.save(Audit.of(invitedMember, selfUser, Audit.Action.INVITE_CREATE))
         } else if (invitedMember.status == Member.MembershipStatus.REQUESTED) {
-            invitedMember.status = Member.MembershipStatus.GRANTED
-            invitedMember.canView = true
+            invitedMember.apply {
+                status = Member.MembershipStatus.GRANTED
+                canView = true
+            }
             invitedMember = memberRepository.save(invitedMember)
             auditLogRepository.save(Audit.of(invitedMember, selfUser, Audit.Action.MEMBERSHIP_GRANT))
         }
@@ -140,6 +149,8 @@ class MemberManagement @Autowired constructor(
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && (selfMember?.hasEffectiveManagementPower() != true) || selfUser.uuid != userUUID)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        if (userUUID in INTERNAL_USER_UUIDS || userUUID == board.ownerUUID)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         if (member.status != Member.MembershipStatus.BLOCKED) {

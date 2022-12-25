@@ -46,6 +46,24 @@ class MemberJson(
         @JsonInclude(JsonInclude.Include.NON_NULL)
         var canAdministrate: Boolean? = null
 
+        companion object {
+
+            val ALL = Permissions().apply {
+                canView = true
+                canUse = true
+                canManage = true
+                canAdministrate = true
+            }
+
+            val MIN = Permissions().apply {
+                canView = true
+                canUse = false
+                canManage = false
+                canAdministrate = false
+            }
+
+        }
+
     }
 
     @JsonProperty(value = "versionTimestamp", required = false)
@@ -54,24 +72,16 @@ class MemberJson(
 
     fun includeUser(skip: Boolean = false, userSupplier: Supplier<UserJson>? = null): MemberJson {
         if (skip) return this
-        if (userSupplier == null) {
-            val tmp = UserJson()
-            tmp.id = member?.userUUID
-            user = tmp
-        } else {
-            user = userSupplier.get()
+        user = userSupplier?.get() ?: UserJson().apply {
+            id = member?.userUUID
         }
         return this
     }
 
     fun includeBoard(skip: Boolean = false, boardSupplier: Supplier<BoardJson>? = null): MemberJson {
         if (skip) return this
-        if (boardSupplier == null) {
-            val tmp = BoardJson()
-            tmp.id = member?.boardId
-            board = tmp
-        } else {
-            board = boardSupplier.get()
+        board = boardSupplier?.get() ?: BoardJson().apply {
+            id = member?.boardId
         }
         return this
     }
@@ -84,12 +94,12 @@ class MemberJson(
 
     fun includePermissions(skip: Boolean = false): MemberJson {
         if (skip) return this
-        val tmp = Permissions()
-        tmp.canView = member?.canView
-        tmp.canUse = member?.canUse
-        tmp.canManage = member?.canManage
-        tmp.canAdministrate = member?.canAdministrate
-        permissions = tmp
+        permissions = Permissions().apply {
+            canView = member?.canView
+            canUse = member?.canUse
+            canManage = member?.canManage
+            canAdministrate = member?.canAdministrate
+        }
         return this
     }
 

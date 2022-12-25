@@ -80,19 +80,19 @@ class UserJson(
 
     fun includeName(skip: Boolean = false): UserJson {
         if (skip) return this
-        val tmp = Name()
-        tmp.displayName = user?.displayName
-        name = tmp
+        name = Name().apply {
+            displayName = user?.displayName
+        }
         return this
     }
 
     fun includeFullName(skip: Boolean = false): UserJson {
         if (skip) return this
-        val tmp = Name()
-        tmp.firstName = user?.firstName
-        tmp.lastName = user?.lastName
-        tmp.displayName = user?.displayName
-        name = tmp
+        name = Name().apply {
+            firstName = user?.firstName
+            lastName = user?.lastName
+            displayName = user?.displayName
+        }
         return this
     }
 
@@ -104,13 +104,13 @@ class UserJson(
 
     fun includePermissions(skip: Boolean = false): UserJson {
         if (skip) return this
-        val tmp = Permissions()
-        tmp.isSystem = user?.isSystem
-        tmp.isAdmin = user?.isAdmin
-        tmp.canLogin = user?.canLogin
-        tmp.canBoardCreate = user?.canBoardCreate
-        tmp.canBoardJoin = user?.canBoardJoin
-        permissions = tmp
+        permissions = Permissions().apply {
+            isSystem = user?.isSystem
+            isAdmin = user?.isAdmin
+            canLogin = user?.canLogin
+            canBoardCreate = user?.canBoardCreate
+            canBoardJoin = user?.canBoardJoin
+        }
         return this
     }
 
