@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.endpoints.data.board.ticket
 
-import de.hypercdn.ticat.api.entities.helper.getBoardIfExists
-import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackWhenAllowed
+import de.hypercdn.ticat.api.entities.helper.getBoardIfExistsElse404
+import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
 import de.hypercdn.ticat.api.entities.helper.hasEffectiveManagementPower
 import de.hypercdn.ticat.api.entities.helper.hasEffectiveUsePower
 import de.hypercdn.ticat.api.entities.json.`in`.TicketCreateJson
@@ -13,6 +13,7 @@ import de.hypercdn.ticat.api.entities.sql.entities.Member
 import de.hypercdn.ticat.api.entities.sql.entities.Ticket
 import de.hypercdn.ticat.api.entities.sql.repo.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -31,9 +32,9 @@ class TicketManagement @Autowired constructor(
         @RequestBody requestBody: TicketCreateJson,
         @PathVariable("boardId") boardId: String
     ): TicketJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val newTicket = Ticket()
@@ -71,14 +72,17 @@ class TicketManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String,
         @PathVariable("ticketId") ticketId: Int
     ): TicketJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val ticket = ticketRepository.findById(Ticket.Key(ticketId, board.id)).orElse(null)
+        val ticket = ticketRepository.findByIdOrNull(Ticket.Key(ticketId, board.id))
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        requestBody.versionBaseTimestamp?.let { if (ticket.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+        requestBody.versionBaseTimestamp?.let {
+            if (ticket.modifiedAt.isAfter(it))
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity")
+        }
         requestBody.title?.let { ticket.title = it }
         requestBody.content?.let { ticket.content = it }
         requestBody.assigneeUUID?.let { ticket.assigneeUUID = it }
@@ -112,14 +116,14 @@ class TicketManagement @Autowired constructor(
         @PathVariable("ticketId") ticketId: Int,
         @RequestParam("actualDelete", required = false, defaultValue = "false") actualDelete: Boolean
     ): TicketJson? {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!selfUser.isAdmin && selfMember?.hasEffectiveUsePower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val ticket = ticketRepository.findById(Ticket.Key(ticketId, board.id)).orElse(null)
+        val ticket = ticketRepository.findByIdOrNull(Ticket.Key(ticketId, board.id))
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        return if (actualDelete && selfMember.hasEffectiveManagementPower()) {
+        return if (actualDelete && selfMember?.hasEffectiveManagementPower() == true) {
             ticketRepository.delete(ticket)
             auditLogRepository.save(Audit.of(ticket, selfUser, Audit.Action.TICKET_DELETE))
             null

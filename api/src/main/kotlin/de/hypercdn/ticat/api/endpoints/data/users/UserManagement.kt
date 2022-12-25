@@ -1,6 +1,7 @@
 package de.hypercdn.ticat.api.endpoints.data.users
 
-import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackWhenAllowed
+import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
+import de.hypercdn.ticat.api.entities.helper.getUserIfExistsElse404
 import de.hypercdn.ticat.api.entities.json.`in`.UserUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.sql.entities.Audit
@@ -26,10 +27,13 @@ class UserManagement @Autowired constructor(
         @PathVariable("userUUID") userUUID: UUID,
         @RequestBody requestBody: UserUpdateJson
     ): UserJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
         if (!selfUser.isAdmin) throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val user = userRepository.findById(userUUID).orElse(null)
-        requestBody.versionBaseTimestamp?.let { if (user.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
+        val user = userRepository.getUserIfExistsElse404(userUUID)
+        requestBody.versionBaseTimestamp?.let {
+            if (user.modifiedAt.isAfter(it))
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity")
+        }
         requestBody.permissions?.let {
             it.canLogin?.let { v -> user.canLogin = v }
             it.canBoardCreate?.let { v -> user.canBoardCreate = v }

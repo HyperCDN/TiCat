@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Min
 import org.hibernate.validator.constraints.Range
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -34,7 +35,7 @@ class BoardInfo @Autowired constructor(
         @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
         @RequestParam("chunkSize", required = false, defaultValue = "50") @Range(min = 1, max = 50) chunkSize: Int
     ): PagedData<BoardJson> {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
+        val selfUser = userRepository.getLoggedInOrFallbackElse403()
         val pageRequest = PageRequest.of(page, chunkSize)
         val boards = boardRepository.getBoardsAvailableTo(selfUser)
         return PagedData<BoardJson>(pageRequest).apply {
@@ -58,9 +59,9 @@ class BoardInfo @Autowired constructor(
     fun getBoardInfo(
         @PathVariable("boardId") boardId: String
     ): BoardJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed()
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403()
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         return BoardJson(board)

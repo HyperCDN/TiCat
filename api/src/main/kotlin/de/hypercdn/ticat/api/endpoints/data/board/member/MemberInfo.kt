@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.endpoints.data.board.member
 
-import de.hypercdn.ticat.api.entities.helper.getBoardIfExists
-import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackWhenAllowed
+import de.hypercdn.ticat.api.entities.helper.getBoardIfExistsElse404
+import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
 import de.hypercdn.ticat.api.entities.helper.hasEffectiveManagementPower
 import de.hypercdn.ticat.api.entities.helper.isVisibleTo
 import de.hypercdn.ticat.api.entities.json.out.BoardJson
@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Min
 import org.hibernate.validator.constraints.Range
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -39,13 +40,13 @@ class MemberInfo @Autowired constructor(
         @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
         @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
     ): PagedData<MemberJson> {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         val pageRequest = PageRequest.of(page, chunkSize)
-        val members = memberRepository.getMembersOf(board, pageRequest, !selfMember.hasEffectiveManagementPower())
+        val members = memberRepository.getMembersOf(board, pageRequest, selfMember?.hasEffectiveManagementPower() != true)
         return PagedData<MemberJson>(pageRequest).apply {
             entities = members.stream()
                 .map {
@@ -59,8 +60,8 @@ class MemberInfo @Autowired constructor(
                             BoardJson(it.board)
                                 .includeId()
                         }
-                        .includePermissions(skip = selfMember.userUUID != selfUser.uuid && !selfMember.hasEffectiveManagementPower())
-                        .includeStatus(skip = !selfMember.hasEffectiveManagementPower())
+                        .includePermissions(skip = selfMember?.userUUID != selfUser.uuid && selfMember?.hasEffectiveManagementPower() != true)
+                        .includeStatus(skip = selfMember?.hasEffectiveManagementPower() != true)
                 }
                 .toList()
         }
@@ -71,12 +72,12 @@ class MemberInfo @Autowired constructor(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID
     ): MemberJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
+        val member = memberRepository.findByIdOrNull(Member.Key(userUUID, board.id))
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return MemberJson(member)
             .includeUser {
@@ -88,8 +89,8 @@ class MemberInfo @Autowired constructor(
                 BoardJson(member.board)
                     .includeId()
             }
-            .includePermissions(skip = selfMember.userUUID != selfUser.uuid && !selfMember.hasEffectiveManagementPower())
-            .includeStatus(skip = !selfMember.hasEffectiveManagementPower())
+            .includePermissions(skip = selfMember?.userUUID != selfUser.uuid && selfMember?.hasEffectiveManagementPower() != true)
+            .includeStatus(skip = selfMember?.hasEffectiveManagementPower() != true)
     }
 
 }

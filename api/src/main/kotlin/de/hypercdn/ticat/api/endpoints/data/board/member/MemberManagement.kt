@@ -13,6 +13,7 @@ import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
 import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -30,8 +31,8 @@ class MemberManagement @Autowired constructor(
     fun requestAccessOrAcceptInvite(
         @PathVariable("boardId") boardId: String,
     ) {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExists(boardId)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
         val selfMembership = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (selfMembership != null) { // invited
             if (selfMembership.status != Member.MembershipStatus.OFFERED) return
@@ -69,8 +70,8 @@ class MemberManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID,
     ): MemberJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExists(boardId)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
         val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
         if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
@@ -105,20 +106,23 @@ class MemberManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID,
     ): MemberJson {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val member = memberRepository.findById(Member.Key(userUUID, board.id)).orElse(null)
+        val member = memberRepository.findByIdOrNull(Member.Key(userUUID, board.id))
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        requestBody.versionBaseTimestamp?.let { if (member.modifiedAt.isAfter(it)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity") }
-        requestBody.block?.let { if (selfMember.hasEffectiveAdministrationPower() && it) member.status = Member.MembershipStatus.BLOCKED }
+        requestBody.versionBaseTimestamp?.let {
+            if (member.modifiedAt.isAfter(it))
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Update based on outdated entity")
+        }
+        requestBody.block?.let { if (selfMember?.hasEffectiveAdministrationPower() == true && it) member.status = Member.MembershipStatus.BLOCKED }
         requestBody.permissions?.let {
             it.canView?.let { v -> member.canView = v }
             it.canUse?.let { v -> member.canUse = v }
             it.canManage?.let { v -> member.canManage = v }
-            it.canAdministrate?.let { v -> if (selfMember.hasEffectiveAdministrationPower()) member.canAdministrate = v }
+            it.canAdministrate?.let { v -> if (selfMember?.hasEffectiveAdministrationPower() == true) member.canAdministrate = v }
         }
         val updatedMember = memberRepository.save(member)
         auditLogRepository.save(Audit.of(updatedMember, selfUser, Audit.Action.MEMBERSHIP_MODIFY))
@@ -137,9 +141,9 @@ class MemberManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String,
         @PathVariable("userUUID") userUUID: UUID,
     ) {
-        val selfUser = userRepository.getLoggedInOrFallbackWhenAllowed(null)
-        val board = boardRepository.getBoardIfExists(boardId)
-        val selfMember = memberRepository.findById(Member.Key(selfUser.uuid, board.id)).orElse(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(null)
+        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!selfUser.isAdmin && (selfMember?.hasEffectiveManagementPower() != true) || selfUser.uuid != userUUID)
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         if (userUUID in INTERNAL_USER_UUIDS || userUUID == board.ownerUUID)
