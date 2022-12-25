@@ -14,6 +14,26 @@ fun Board.isVisibleTo(user: User, member: Member? = null): Boolean {
     }
 }
 
+fun Board.isUsableBy(user: User, member: Member? = null): Boolean {
+    return user.isAdmin
+            || member?.hasEffectiveUsePower() == true
+}
+
+fun Board.isManageableBy(user: User, member: Member? = null): Boolean {
+    return user.isAdmin
+            || member?.hasEffectiveManagementPower() == true
+}
+
+fun Board.isAdministrableBy(user: User, member: Member? = null): Boolean {
+    return user.isAdmin
+            || member?.hasEffectiveAdministrationPower() == true
+}
+
+fun Board.isOwnedBy(user: User): Boolean {
+    return user.isAdmin
+            || user.uuid == ownerUUID
+}
+
 fun Member.hasEffectiveViewPower(): Boolean {
     return user.isAdmin
             || board.ownerUUID == userUUID
@@ -40,9 +60,4 @@ fun Member.hasEffectiveAdministrationPower(): Boolean {
             || board.ownerUUID == userUUID
             || (status == Member.MembershipStatus.GRANTED
             && (canAdministrate))
-}
-
-fun Member.hasOwnershipPower(): Boolean {
-    return user.isAdmin
-            || board.ownerUUID == userUUID
 }

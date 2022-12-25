@@ -1,6 +1,6 @@
 package de.hypercdn.ticat.api.endpoints.data.board.member
 
-import de.hypercdn.ticat.api.entities.helper.getBoardIfExistsElse404
+import de.hypercdn.ticat.api.entities.helper.findByIdElseThrow404
 import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
 import de.hypercdn.ticat.api.entities.helper.hasEffectiveManagementPower
 import de.hypercdn.ticat.api.entities.helper.isVisibleTo
@@ -41,7 +41,7 @@ class MemberInfo @Autowired constructor(
         @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
     ): PagedData<MemberJson> {
         val selfUser = userRepository.getLoggedInOrFallbackElse403(null)
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
@@ -73,12 +73,11 @@ class MemberInfo @Autowired constructor(
         @PathVariable("userUUID") userUUID: UUID
     ): MemberJson {
         val selfUser = userRepository.getLoggedInOrFallbackElse403(null)
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val member = memberRepository.findByIdOrNull(Member.Key(userUUID, board.id))
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val member = memberRepository.findByIdElseThrow404(Member.Key(userUUID, board.id))
         return MemberJson(member)
             .includeUser {
                 UserJson(member.user)

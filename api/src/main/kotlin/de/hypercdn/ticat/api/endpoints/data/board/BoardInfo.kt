@@ -60,7 +60,7 @@ class BoardInfo @Autowired constructor(
         @PathVariable("boardId") boardId: String
     ): BoardJson {
         val selfUser = userRepository.getLoggedInOrFallbackElse403()
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)

@@ -1,9 +1,11 @@
 package de.hypercdn.ticat.api.entities.helper
 
 import de.hypercdn.ticat.api.entities.sql.entities.Board
+import de.hypercdn.ticat.api.entities.sql.entities.Member
 import de.hypercdn.ticat.api.entities.sql.entities.Ticket
 import de.hypercdn.ticat.api.entities.sql.entities.User
 import de.hypercdn.ticat.api.entities.sql.repo.BoardRepository
+import de.hypercdn.ticat.api.entities.sql.repo.MemberRepository
 import de.hypercdn.ticat.api.entities.sql.repo.TicketRepository
 import de.hypercdn.ticat.api.entities.sql.repo.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -25,19 +27,25 @@ fun UserRepository.getLoggedInOrFallbackElse403(fallbackUUID: UUID? = User.GUEST
 }
 
 @Throws(ResponseStatusException::class)
-fun BoardRepository.getBoardIfExistsElse404(boardId: String): Board {
+fun BoardRepository.findByIdElseThrow404(boardId: String): Board {
     return findByIdOrNull(boardId.uppercase())
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 }
 
 @Throws(ResponseStatusException::class)
-fun TicketRepository.getTicketIfExistsElse404(ticketId: Ticket.Key): Ticket {
+fun TicketRepository.findByIdElseThrow404(ticketId: Ticket.Key): Ticket {
     return findByIdOrNull(ticketId)
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 }
 
 @Throws(ResponseStatusException::class)
-fun UserRepository.getUserIfExistsElse404(userUUID: UUID): User {
+fun UserRepository.findByIdElseThrow404(userUUID: UUID): User {
     return findByIdOrNull(userUUID)
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+}
+
+@Throws(ResponseStatusException::class)
+fun MemberRepository.findByIdElseThrow404(memberId: Member.Key): Member {
+    return findByIdOrNull(memberId)
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 }

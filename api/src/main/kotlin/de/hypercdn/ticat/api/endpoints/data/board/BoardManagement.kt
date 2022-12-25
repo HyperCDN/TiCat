@@ -1,8 +1,6 @@
 package de.hypercdn.ticat.api.endpoints.data.board
 
-import de.hypercdn.ticat.api.entities.helper.getBoardIfExistsElse404
-import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
-import de.hypercdn.ticat.api.entities.helper.hasEffectiveManagementPower
+import de.hypercdn.ticat.api.entities.helper.*
 import de.hypercdn.ticat.api.entities.json.`in`.BoardCreateJson
 import de.hypercdn.ticat.api.entities.json.`in`.BoardUpdateJson
 import de.hypercdn.ticat.api.entities.json.out.BoardJson
@@ -73,9 +71,9 @@ class BoardManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String
     ): BoardJson {
         val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
-        if (!selfUser.isAdmin && selfMember?.hasEffectiveManagementPower() != true)
+        if (!board.isManageableBy(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         requestBody.versionBaseTimestamp?.let {
             if (board.modifiedAt.isAfter(it))
@@ -115,8 +113,8 @@ class BoardManagement @Autowired constructor(
         @PathVariable("boardId") boardId: String
     ) {
         val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
-        if (!selfUser.isAdmin && board.ownerUUID != selfUser.uuid)
+        val board = boardRepository.findByIdElseThrow404(boardId)
+        if (!board.isOwnedBy(selfUser))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         boardRepository.delete(board)
         auditLogRepository.save(Audit.of(board, selfUser, Audit.Action.BOARD_DELETE))

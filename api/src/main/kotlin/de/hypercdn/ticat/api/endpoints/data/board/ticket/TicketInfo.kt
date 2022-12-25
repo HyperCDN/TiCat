@@ -1,8 +1,7 @@
 package de.hypercdn.ticat.api.endpoints.data.board.ticket
 
-import de.hypercdn.ticat.api.entities.helper.getBoardIfExistsElse404
+import de.hypercdn.ticat.api.entities.helper.findByIdElseThrow404
 import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
-import de.hypercdn.ticat.api.entities.helper.getTicketIfExistsElse404
 import de.hypercdn.ticat.api.entities.helper.isVisibleTo
 import de.hypercdn.ticat.api.entities.json.out.BoardJson
 import de.hypercdn.ticat.api.entities.json.out.TicketJson
@@ -43,7 +42,7 @@ class TicketInfo @Autowired constructor(
         @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
     ): PagedData<TicketJson> {
         val selfUser = userRepository.getLoggedInOrFallbackElse403()
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
@@ -76,11 +75,11 @@ class TicketInfo @Autowired constructor(
         @PathVariable("ticketId") ticketId: Int
     ): TicketJson {
         val selfUser = userRepository.getLoggedInOrFallbackElse403()
-        val board = boardRepository.getBoardIfExistsElse404(boardId)
+        val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        val ticket = ticketRepository.getTicketIfExistsElse404(Ticket.Key(ticketId, board.id))
+        val ticket = ticketRepository.findByIdElseThrow404(Ticket.Key(ticketId, board.id))
         return TicketJson(ticket)
             .includeId()
             .includeTitle()

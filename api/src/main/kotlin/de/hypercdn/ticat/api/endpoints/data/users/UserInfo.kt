@@ -1,7 +1,7 @@
 package de.hypercdn.ticat.api.endpoints.data.users
 
+import de.hypercdn.ticat.api.entities.helper.findByIdElseThrow404
 import de.hypercdn.ticat.api.entities.helper.getLoggedInOrFallbackElse403
-import de.hypercdn.ticat.api.entities.helper.getUserIfExistsElse404
 import de.hypercdn.ticat.api.entities.json.out.UserJson
 import de.hypercdn.ticat.api.entities.json.out.helper.PagedData
 import de.hypercdn.ticat.api.entities.sql.entities.User
@@ -45,7 +45,7 @@ class UserInfo @Autowired constructor(
         @PathVariable("userUUID") userUUID: UUID
     ): UserJson {
         val selfUser = userRepository.getLoggedInOrFallbackElse403()
-        val user = userRepository.getUserIfExistsElse404(userUUID)
+        val user = userRepository.findByIdElseThrow404(userUUID)
         return UserJson(user)
             .includeId()
             .includeName()
