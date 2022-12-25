@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -29,6 +30,7 @@ class AuditInfo @Autowired constructor(
 ) {
 
     @GetMapping("/audit")
+    @Validated
     fun getGlobalScopedAuditLog(
         @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
         @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
@@ -51,6 +53,7 @@ class AuditInfo @Autowired constructor(
     }
 
     @GetMapping("/audit/{boardId}")
+    @Validated
     fun getBoardScopedAuditLog(
         @PathVariable("boardId") boardId: String,
         @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
