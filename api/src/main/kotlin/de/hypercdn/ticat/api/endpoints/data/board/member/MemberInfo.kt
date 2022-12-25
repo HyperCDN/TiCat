@@ -40,7 +40,7 @@ class MemberInfo @Autowired constructor(
         @RequestParam("page", required = false, defaultValue = "0") @Min(0) page: Int,
         @RequestParam("chunkSize", required = false, defaultValue = "100") @Range(min = 1, max = 100) chunkSize: Int
     ): PagedData<MemberJson> {
-        val selfUser = userRepository.getLoggedInOrFallbackElse403(null)
+        val selfUser = userRepository.getLoggedInOrFallbackElse403(fallbackUUID = null)
         val board = boardRepository.findByIdElseThrow404(boardId)
         val selfMember = memberRepository.findByIdOrNull(Member.Key(selfUser.uuid, board.id))
         if (!board.isVisibleTo(selfUser, selfMember))

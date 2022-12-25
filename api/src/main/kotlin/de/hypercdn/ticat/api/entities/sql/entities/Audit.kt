@@ -1,13 +1,15 @@
 package de.hypercdn.ticat.api.entities.sql.entities
 
 import jakarta.persistence.*
-import org.hibernate.annotations.ColumnDefault
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.Generated
-import org.hibernate.annotations.GenerationTime
+import jakarta.persistence.Table
+import org.hibernate.annotations.*
 import java.time.OffsetDateTime
 import java.util.*
 
+@Entity
+@Table(name = "audit_log")
+@DynamicInsert
+@DynamicUpdate
 class Audit {
 
     @Id

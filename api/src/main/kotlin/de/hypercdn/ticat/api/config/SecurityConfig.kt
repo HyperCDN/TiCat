@@ -25,7 +25,7 @@ class SecurityConfig {
                 it.requestMatchers(HttpMethod.PATCH, "").permitAll()
                 it.requestMatchers(HttpMethod.DELETE, "").permitAll()
                 // auth required
-                it.requestMatchers(HttpMethod.GET, "/jwt").authenticated()
+                it.requestMatchers(HttpMethod.GET, "/jwt", "/audit", "/audit/*").authenticated()
                 it.requestMatchers(HttpMethod.POST, "/jwt", "/board", "/invite/*", "/invite/*/*").authenticated()
                 it.requestMatchers(HttpMethod.PATCH, "/board/*", "/member/*/*", "/user/*").authenticated()
                 it.requestMatchers(HttpMethod.DELETE, "/board/*", "/member/*/*").authenticated()
