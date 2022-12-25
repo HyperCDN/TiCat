@@ -78,8 +78,7 @@ class MemberManagement @Autowired constructor(
         val invitedUser = userRepository.findByIdElseThrow404(userUUID)
         var invitedMember = memberRepository.findByIdOrNull(Member.Key(invitedUser.uuid, board.id))
         if (invitedMember == null) {
-            invitedMember = Member.newFor(board, invitedUser, Member.MembershipStatus.OFFERED, MemberJson.Permissions.MIN)
-            invitedMember = memberRepository.save(invitedMember)
+            invitedMember = memberRepository.save(Member.newFor(board, invitedUser, Member.MembershipStatus.OFFERED, MemberJson.Permissions.MIN))
             auditLogRepository.save(Audit.of(invitedMember, selfUser, Audit.Action.INVITE_CREATE))
         } else if (invitedMember.status == Member.MembershipStatus.REQUESTED) {
             invitedMember.apply {
